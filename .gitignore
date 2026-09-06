@@ -1,0 +1,51 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+backend/.env
+frontend/.env
+ml/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.Python
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+htmlcov/
+.coverage
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.vite/
+npm-debug.log*
+
+# Datasets, generated artifacts and local uploads
+ml/data/raw/*
+ml/data/processed/*
+ml/data/metadata/*
+!ml/data/raw/.gitkeep
+!ml/data/processed/.gitkeep
+!ml/data/metadata/.gitkeep
+ml/models/checkpoints/*
+ml/models/trained/*
+!ml/models/checkpoints/.gitkeep
+!ml/models/trained/.gitkeep
+uploads/
+*.h5
+*.keras
+*.ckpt
+*.onnx
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
