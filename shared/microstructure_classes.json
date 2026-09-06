@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "classes": [
+    {
+      "slug": "austenita",
+      "name": "Austenita",
+      "scientific_description": "Fase gamma del hierro, de estructura cristalina cúbica centrada en las caras."
+    },
+    {
+      "slug": "ferrita",
+      "name": "Ferrita",
+      "scientific_description": "Solución sólida de carbono en hierro alfa, de estructura cristalina cúbica centrada en el cuerpo."
+    },
+    {
+      "slug": "martensita",
+      "name": "Martensita",
+      "scientific_description": "Fase metaestable formada por transformación displaciva de la austenita, generalmente de alta dureza."
+    },
+    {
+      "slug": "perlita",
+      "name": "Perlita",
+      "scientific_description": "Microconstituyente laminar formado principalmente por ferrita y cementita."
+    },
+    {
+      "slug": "perlita-cementita",
+      "name": "Perlita + Cementita",
+      "scientific_description": "Microestructura en la que coexisten regiones de perlita y cementita."
+    },
+    {
+      "slug": "perlita-ferrita-equiaxial",
+      "name": "Perlita + Ferrita Equiaxial",
+      "scientific_description": "Microestructura con colonias de perlita y ferrita de granos aproximadamente equiaxiales."
+    },
+    {
+      "slug": "perlita-ferrita-widmanstatten",
+      "name": "Perlita + Ferrita Widmanstätten",
+      "scientific_description": "Microestructura con perlita y ferrita proeutectoide de morfología Widmanstätten."
+    }
+  ]
+}
