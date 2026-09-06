@@ -4,7 +4,7 @@ Plataforma web académica para apoyar la identificación de fases y microconstit
 
 El sistema no reemplaza el criterio de un especialista metalúrgico. Su propósito es didáctico, investigativo y de apoyo al aprendizaje.
 
-## Estado del proyecto
+## Estado del proyectoo
 
 Avance actual: Supabase configurado, esquema/RLS/Storage verificados, dataset local cargado y autenticación inicial implementada.
 
