@@ -1,5 +1,6 @@
 {
-  "schema_version": "1.0",
+  "schema_version": "1.2",
+  "ordering": "official_training_order",
   "classes": [
     {
       "slug": "austenita",
@@ -12,19 +13,19 @@
       "scientific_description": "Solución sólida de carbono en hierro alfa, de estructura cristalina cúbica centrada en el cuerpo."
     },
     {
-      "slug": "martensita",
-      "name": "Martensita",
-      "scientific_description": "Fase metaestable formada por transformación displaciva de la austenita, generalmente de alta dureza."
-    },
-    {
       "slug": "perlita",
       "name": "Perlita",
       "scientific_description": "Microconstituyente laminar formado principalmente por ferrita y cementita."
     },
     {
-      "slug": "perlita-cementita",
-      "name": "Perlita + Cementita",
-      "scientific_description": "Microestructura en la que coexisten regiones de perlita y cementita."
+      "slug": "cementita-perlita",
+      "name": "Cementita + Perlita",
+      "scientific_description": "Microestructura en la que coexisten regiones de cementita y perlita."
+    },
+    {
+      "slug": "perlita-ferrita-widmanstatten",
+      "name": "Perlita + Ferrita Widmanstätten",
+      "scientific_description": "Microestructura con perlita y ferrita proeutectoide de morfología Widmanstätten."
     },
     {
       "slug": "perlita-ferrita-equiaxial",
@@ -32,9 +33,9 @@
       "scientific_description": "Microestructura con colonias de perlita y ferrita de granos aproximadamente equiaxiales."
     },
     {
-      "slug": "perlita-ferrita-widmanstatten",
-      "name": "Perlita + Ferrita Widmanstätten",
-      "scientific_description": "Microestructura con perlita y ferrita proeutectoide de morfología Widmanstätten."
+      "slug": "martensita",
+      "name": "Martensita",
+      "scientific_description": "Fase metaestable formada por transformación displaciva de la austenita, generalmente de alta dureza."
     }
   ]
 }

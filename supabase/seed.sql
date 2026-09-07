@@ -1,5 +1,12 @@
 -- Seed reviewed against shared/microstructure_classes.json.
--- This inserts catalog metadata only; it does not upload or create image records.
+-- Official training order (not alphabetical). Catalog metadata only.
+
+update public.microstructure_classes
+set
+    slug = 'cementita-perlita',
+    name = 'Cementita + Perlita',
+    scientific_description = 'Microestructura en la que coexisten regiones de cementita y perlita.'
+where slug = 'perlita-cementita';
 
 insert into public.microstructure_classes (slug, name, scientific_description)
 values
@@ -14,19 +21,19 @@ values
         'Solución sólida de carbono en hierro alfa, de estructura cristalina cúbica centrada en el cuerpo.'
     ),
     (
-        'martensita',
-        'Martensita',
-        'Fase metaestable formada por transformación displaciva de la austenita, generalmente de alta dureza.'
-    ),
-    (
         'perlita',
         'Perlita',
         'Microconstituyente laminar formado principalmente por ferrita y cementita.'
     ),
     (
-        'perlita-cementita',
-        'Perlita + Cementita',
-        'Microestructura en la que coexisten regiones de perlita y cementita.'
+        'cementita-perlita',
+        'Cementita + Perlita',
+        'Microestructura en la que coexisten regiones de cementita y perlita.'
+    ),
+    (
+        'perlita-ferrita-widmanstatten',
+        'Perlita + Ferrita Widmanstätten',
+        'Microestructura con perlita y ferrita proeutectoide de morfología Widmanstätten.'
     ),
     (
         'perlita-ferrita-equiaxial',
@@ -34,9 +41,9 @@ values
         'Microestructura con colonias de perlita y ferrita de granos aproximadamente equiaxiales.'
     ),
     (
-        'perlita-ferrita-widmanstatten',
-        'Perlita + Ferrita Widmanstätten',
-        'Microestructura con perlita y ferrita proeutectoide de morfología Widmanstätten.'
+        'martensita',
+        'Martensita',
+        'Fase metaestable formada por transformación displaciva de la austenita, generalmente de alta dureza.'
     )
 on conflict (slug) do update
 set
