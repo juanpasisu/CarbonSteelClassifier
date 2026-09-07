@@ -5,12 +5,12 @@ from backend.app.services.file_validation import (
     validate_image_content,
     validate_image_upload,
 )
-
+from backend.app.services.image_pipeline import prepare_image_for_inference
 
 
 VALID_PNG = bytes.fromhex(
     "89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c489"
-    "0000000d49444154789c6360f8cf00000004000101f9"
+    "0000000d49444154789c63f8cfc0f01f00050001ff89993d1d"
     "0000000049454e44ae426082"
 )
 
@@ -21,6 +21,18 @@ def test_accepts_supported_image_metadata() -> None:
 
 def test_accepts_real_png_content() -> None:
     validate_image_content(VALID_PNG, "image/png")
+
+
+def test_prepare_image_returns_canonical_tensor_shape() -> None:
+    tensor = prepare_image_for_inference(
+        filename="sample.png",
+        content_type="image/png",
+        content=VALID_PNG,
+    )
+    assert tensor.shape == (224, 224, 3)
+    assert tensor.dtype.str == "<f4"
+    # MobileNetV2 preprocess_input maps RGB [0, 255] into approximately [-1, 1].
+    assert -1.0 <= float(tensor.min()) <= float(tensor.max()) <= 1.0
 
 
 def test_rejects_fake_image_content() -> None:
