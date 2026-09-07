@@ -1,30 +1,30 @@
 # CarbonSteelClassifier
 
-Plataforma web académica para apoyar la identificación de fases y microconstituyentes en imágenes metalográficas de aceros al carbono mediante visión por computador y redes neuronales convolucionales (CNN).
+Plataforma web académica de acceso público para apoyar la identificación de fases y microconstituyentes en imágenes metalográficas de aceros al carbono mediante visión por computador y redes neuronales convolucionales (CNN).
 
 El sistema no reemplaza el criterio de un especialista metalúrgico. Su propósito es didáctico, investigativo y de apoyo al aprendizaje.
 
-## Estado del proyectoo
+## Estado del proyecto
 
-Avance actual: Supabase configurado, esquema/RLS/Storage verificados, dataset local cargado y autenticación inicial implementada.
+Avance actual: stack oficial **Python 3.11 + TensorFlow/Keras + MobileNetV2**. Modelo activo `active.keras` (~89.7% accuracy en test). Registrado en Supabase como `MicrostructureCNN` v2.0.
 
 ## Tecnologías
 
 - **Frontend:** React, Vite, TypeScript y Tailwind CSS.
-- **Backend:** Python, FastAPI, Pydantic y Uvicorn.
-- **Machine Learning:** TensorFlow/Keras, NumPy, Pandas, scikit-learn, OpenCV y Matplotlib.
-- **Datos y servicios:** Supabase (PostgreSQL, Auth y Storage).
+- **Backend:** Python 3.11, FastAPI, Pydantic y Uvicorn.
+- **Machine Learning:** TensorFlow/Keras, MobileNetV2 (transfer learning), NumPy, scikit-learn, OpenCV y Matplotlib.
+- **Datos y servicios:** Supabase (PostgreSQL para clases, modelos y estadísticas anónimas).
 - **Calidad:** Git, pytest y configuraciones reproducibles mediante variables de entorno.
 
 ## Arquitectura resumida
 
-El frontend gestiona la experiencia del usuario y la sesión de Supabase Auth. Envía el token de acceso y las imágenes al backend FastAPI. El backend valida la solicitud, registra los metadatos, delega el procesamiento al pipeline compartido de ML y ejecuta el modelo activo. Los resultados y el historial se persisten en PostgreSQL; las imágenes se almacenan en Supabase Storage. La clave \`service_role\` permanece únicamente en el backend.
+El usuario accede directamente, carga una imagen y recibe la predicción de la CNN. FastAPI valida la imagen en memoria, aplica el preprocessing de MobileNetV2 y ejecuta el modelo `.keras`. Opcionalmente registra estadísticas anónimas en Supabase.
 
-La arquitectura detallada está en [\`docs/architecture.md\`](docs/architecture.md) y el plan de trabajo en [\`docs/roadmap.md\`](docs/roadmap.md).
+Documentación: [`docs/architecture.md`](docs/architecture.md) · roadmap: [`docs/roadmap.md`](docs/roadmap.md) · ML: [`docs/ml-pipeline.md`](docs/ml-pipeline.md).
 
 ## Estructura
 
-\`\`\`text
+```text
 CarbonSteelClassifier/
 ├── backend/                 # API FastAPI y servicios de aplicación
 ├── frontend/                # Aplicación React/Vite/TypeScript
@@ -33,56 +33,73 @@ CarbonSteelClassifier/
 ├── supabase/                # Migraciones y seed de PostgreSQL
 ├── docs/                    # Documentación técnica
 └── tests/                   # Pruebas automatizadas
-\`\`\`
+```
 
-Las siete etiquetas de microestructuras están centralizadas en [\`shared/microstructure_classes.json\`](shared/microstructure_classes.json). Ese archivo es la fuente canónica para backend, ML, frontend y el futuro seed de Supabase.
+Las siete etiquetas están centralizadas en [`shared/microstructure_classes.json`](shared/microstructure_classes.json).
 
 ## Requisitos
 
-- Python 3.11 o superior.
+- Python **3.11** (recomendado vía `uv python install 3.11`).
 - Node.js 20 o superior y npm.
-- Una cuenta/proyecto de Supabase para las fases de integración.
+- Proyecto Supabase para catálogo, modelos y estadísticas (sin Auth de producto).
 
 ## Configuración inicial
 
-1. Copiar .env.example a .env para consultar las variables disponibles. En desarrollo el backend lee el .env raíz; la clave service_role debe permanecer solo en el servidor.
-2. Crear un entorno virtual para Python e instalar las dependencias del backend:
+1. Crear el entorno virtual con Python 3.11:
 
-   \`\`\`bash
-   cd backend
-   python -m venv .venv
-   # Linux/macOS: source .venv/bin/activate
-   # Windows: .venv\\Scripts\\activate
-   pip install -r requirements.txt
-   \`\`\`
+   ```bash
+   # Si usas uv:
+   uv python install 3.11
+   uv venv --python 3.11 .venv
+   source .venv/bin/activate
+   python -m ensurepip --upgrade
+   pip install -r backend/requirements.txt -r ml/requirements.txt
+   ```
 
-3. Instalar las dependencias del frontend:
+2. Copiar `.env.example` a `.env`. La clave `service_role` debe permanecer solo en el servidor.
+   `MODEL_PATH` debe apuntar a `ml/models/trained/active.keras`.
 
-   \`\`\`bash
+3. Instalar el frontend:
+
+   ```bash
    cd frontend
    npm install
-   \`\`\`
+   ```
 
-## Verificación de la Fase 1
+## Entrenar el modelo
 
-Backend:
+```bash
+source .venv/bin/activate
+PYTHONPATH=. python -m ml.src.training.train --epochs 12 --fine-tune-epochs 6
+```
 
-\`\`\`bash
-cd backend
-.venv/bin/python -m uvicorn app.main:app --reload
-\`\`\`
+## Verificación local
 
-Abrir \`http://127.0.0.1:8000/health\` o la documentación interactiva en \`http://127.0.0.1:8000/docs\`.
+Backend (desde la raíz del repositorio, con el `.venv` de Python 3.11):
+
+```bash
+cd /path/to/CarbonSteelClassifier
+source .venv/bin/activate
+./scripts/run_backend.sh
+```
+
+Equivalente manual:
+
+```bash
+cd /path/to/CarbonSteelClassifier
+source .venv/bin/activate
+PYTHONPATH=. python -m uvicorn backend.app.main:app --reload --host 127.0.0.1 --port 8000
+```
+
+No uses `backend/.venv` (Python 3.14) ni ejecutes `uvicorn backend.app.main:app` desde dentro de `backend/` con `PYTHONPATH=.`: ahí no existe el paquete `backend`.
 
 Frontend:
 
-\`\`\`bash
+```bash
 cd frontend
 npm run dev
-\`\`\`
-
-La aplicación debe abrirse en la URL indicada por Vite.
+```
 
 ## Próximo paso
 
-La siguiente iteración es validar manualmente el registro e inicio de sesión con Supabase Auth y completar el flujo autenticado de carga y análisis de imágenes.
+Reiniciar el backend con el `.venv` de Python 3.11 y verificar el flujo end-to-end desde el frontend.

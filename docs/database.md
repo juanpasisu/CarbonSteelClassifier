@@ -2,43 +2,55 @@
 
 ## Alcance
 
-El dataset de la CNN se alimentará únicamente con imágenes organizadas por carpetas. No se necesita un CSV para asignar la etiqueta: el nombre de la carpeta usa el slug canónico de shared/microstructure_classes.json.
+El dataset de la CNN se alimenta con imágenes organizadas por carpetas. El slug de cada carpeta coincide con `shared/microstructure_classes.json`.
 
-Las imágenes binarias deben vivir en Supabase Storage. PostgreSQL conservará metadatos, relaciones, predicciones e historial; no se guardarán los bytes de las imágenes dentro de una columna.
+Las imágenes enviadas por usuarios de la aplicación se procesan en memoria y no se persisten. PostgreSQL guarda catálogo, modelos y estadísticas anónimas de predicción.
 
 ## Tablas
 
-| Tabla | Propósito | Propietario lógico |
+| Tabla | Propósito | Notas |
 | --- | --- | --- |
-| profiles | Datos complementarios del usuario | Usuario autenticado |
-| microstructure_classes | Catálogo de las siete clases | Catálogo del sistema |
-| images | Metadatos de imágenes analizadas | Usuario autenticado |
-| analyses | Resultado principal de cada análisis | Usuario autenticado |
-| predictions | Probabilidad por clase para un análisis | Usuario autenticado vía análisis |
-| ml_models | Versiones y metadatos de modelos | Sistema |
+| microstructure_classes | Catálogo de las siete clases | Lectura pública |
+| ml_models | Versiones y metadatos de modelos | Lectura pública; un modelo activo |
+| analyses | Resultado anónimo de cada predicción | Sin `user_id`; opcional para stats |
+| predictions | Probabilidad por clase de un análisis | Ligada a `analyses` |
 
-La tabla images conserva una relación compuesta con analyses para impedir que un análisis vincule una imagen de otro usuario. El índice parcial de ml_models permite un solo modelo activo.
+Tablas retiradas del diseño de producto: `profiles`, `images` y cualquier dependencia de `auth.users`.
 
-## Storage
+## Migraciones
 
-La migración crea el bucket privado microstructure-images con límite de 25 MB y MIME permitidos JPG, PNG, WEBP y TIFF. La ruta prevista es:
+1. `20260905_000001_initial_schema.sql` — esquema original con usuarios (histórico).
+2. `20260906_000002_public_access_schema.sql` — adapta el proyecto a acceso público: elimina perfiles/imágenes de usuario, recrea `analyses`/`predictions` anónimos y abre lectura de catálogos.
 
-~~~text
-user_id/image_id/original.ext
-~~~
+Aplicar la segunda migración solo tras revisar el SQL Editor de Supabase. Si ya existen datos de usuarios reales, confirmar el respaldo antes del `DROP`.
 
-Las políticas de storage.objects restringen lectura, carga, actualización y eliminación al primer segmento de la ruta, que debe ser el UUID del usuario autenticado.
+El bucket `microstructure-images` no se elimina por SQL: Supabase no permite `DELETE` directo en `storage.buckets`. Si el bucket sigue existiendo, bórralo desde **Dashboard → Storage** (o la Storage API). Las políticas de ese bucket sí se eliminan en la migración.
 
-El dataset de entrenamiento local no se sube automáticamente a este bucket de usuarios. Si se necesita una copia en la nube, se creará un bucket administrativo separado, por ejemplo training-dataset, con políticas distintas y revisión explícita.
+## Seed
+
+`supabase/seed.sql` inserta o actualiza las siete clases oficiales en el orden de entrenamiento y renombra el slug legado `perlita-cementita` → `cementita-perlita`.
+
+## Registro del modelo activo
+
+Tras entrenar, registra la versión en `ml_models`:
+
+```bash
+PYTHONPATH=. python scripts/register_active_model.py --name MicrostructureCNN --version 1.0
+```
+
+El script desactiva modelos previos, hace upsert por `(name, version)` y marca el nuevo registro como `is_active`.
+
+## Logging anónimo de predicciones
+
+Cada `POST /api/v1/predict` exitoso intenta insertar:
+
+1. Una fila en `analyses` (`predicted_class_id`, `confidence`, `model_id`)
+2. Siete filas en `predictions` (probabilidad por clase)
+
+Si Supabase no está configurado o falla, la predicción HTTP sigue respondiendo con éxito. No se guardan imágenes ni datos personales.
 
 ## RLS
 
-- Cada usuario solo puede leer, modificar y eliminar sus propios perfiles e imágenes.
-- Cada usuario solo puede consultar y eliminar sus propios análisis.
-- Las predicciones se pueden consultar únicamente cuando el análisis padre pertenece al usuario.
-- El catálogo de clases y los modelos se pueden consultar por usuarios autenticados.
-- Las escrituras de análisis y predicciones quedan reservadas al backend mediante la service role key, que nunca debe llegar al frontend.
-
-## Aplicación
-
-La migración está en supabase/migrations/20260905_000001_initial_schema.sql. El archivo modifica estructura y políticas, pero no se ejecuta desde este repositorio. Debe revisarse en el SQL Editor de Supabase antes de aplicarlo.
+- Lectura pública (`anon` / `authenticated`) de clases, modelos, análisis y predicciones.
+- Escrituras de análisis vía backend con `service_role` (bypass de RLS).
+- Sin políticas basadas en `auth.uid()` para el flujo de producto.

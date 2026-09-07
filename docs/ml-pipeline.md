@@ -1,51 +1,56 @@
 # Pipeline de Machine Learning
 
+## Stack oficial
+
+- Python **3.11**
+- TensorFlow / Keras
+- MobileNetV2 + transfer learning
+- Artefacto de producción: `ml/models/trained/active.keras`
+
+PyTorch ya no es el framework oficial. Los pesos históricos quedaron en `ml/models/archive/pytorch-v1/`.
+
 ## Fuente de datos
 
-El dataset se organiza exclusivamente como imágenes dentro de una carpeta por clase:
-
-~~~text
+```text
 ml/data/raw/
 ├── austenita/
 ├── ferrita/
-├── martensita/
 ├── perlita/
-├── perlita-cementita/
+├── cementita-perlita/
+├── perlita-ferrita-widmanstatten/
 ├── perlita-ferrita-equiaxial/
-└── perlita-ferrita-widmanstatten/
-~~~
+└── martensita/
+```
 
-No se requiere un CSV para asignar las etiquetas: el slug de la carpeta es la etiqueta canónica. Los nombres de carpeta deben coincidir con shared/microstructure_classes.json.
+## Orden oficial de clases (entrenamiento)
 
-## Estado de la inspección inicial
+1. Austenita  
+2. Ferrita  
+3. Perlita  
+4. Cementita + Perlita  
+5. Perlita + Ferrita Widmanstätten  
+6. Perlita + Ferrita Equiaxial  
+7. Martensita  
 
-El dataset local contiene actualmente 2.404 imágenes reales:
+Fuente canónica: `shared/microstructure_classes.json` (`ordering: official_training_order`).
 
-| Clase | Imágenes |
-| --- | ---: |
-| Austenita | 304 |
-| Ferrita | 320 |
-| Martensita | 336 |
-| Perlita | 304 |
-| Perlita + Cementita | 288 |
-| Perlita + Ferrita Equiaxial | 320 |
-| Perlita + Ferrita Widmanstätten | 532 |
-| **Total** | **2.404** |
+## Preprocesamiento
 
-Se detectaron también 2.404 archivos Zone.Identifier. Son sidecars de metadatos creados por Windows y no forman parte del dataset; el validador los ignora. No se eliminan automáticamente.
+Compartido entre entrenamiento e inferencia (`ml/src/preprocessing/image.py`):
 
-## Aumentos y particiones
+1. EXIF transpose + RGB  
+2. Resize 224×224 (LANCZOS)  
+3. `tf.keras.applications.mobilenet_v2.preprocess_input`
 
-Se detectaron 1.632 imágenes con sufijos _aug1, _aug2 o _aug3 y 772 grupos de origen. Las variantes aumentadas de una misma imagen no deben repartirse entre train, validación y test. El pipeline debe agruparlas por el nombre base, asignar el grupo completo a una sola partición y solo después construir los conjuntos.
+## Entrenamiento
 
-La partición inicial propuesta es 70% entrenamiento, 15% validación y 15% prueba, con semilla fija. Los porcentajes se ajustarán si el número de grupos por clase o el balance del dataset lo exige.
+```bash
+source .venv/bin/activate
+PYTHONPATH=. python -m ml.src.training.train --epochs 12 --fine-tune-epochs 6
+```
 
-## Próximas validaciones
+Incluye class weights, augmentation moderada, EarlyStopping, ModelCheckpoint y fine-tuning parcial.
 
-1. Ejecutar el validador estructural.
-2. Verificar que cada archivo pueda decodificarse como imagen.
-3. Revisar dimensiones, canales, duplicados y distribución por grupo.
-4. Definir preprocessing único para entrenamiento e inferencia.
-5. Particionar por grupo antes de entrenar.
+## Inferencia
 
-Todavía no se reportan métricas ni se entrena una CNN: primero debe completarse la validación del dataset.
+FastAPI carga `active.keras` una sola vez y usa el mismo preprocessing.

@@ -4,28 +4,34 @@
 
 | Fase | Objetivo | Estado |
 | --- | --- | --- |
-| 0 | Requisitos, arquitectura, tecnologías y flujo de datos | Completada |
-| 1 | Estructura inicial, documentación y shells locales | Completada |
-| 2 | Esquema PostgreSQL, RLS y Storage en Supabase | Completada; aplicado y verificado |
-| 3 | Backend FastAPI base y configuración | Completada; conexión y JWT preparados |
-| 4 | Registro, inicio de sesión y protección de rutas | Implementación inicial; validación manual pendiente |
-| 5 | Carga, validación y almacenamiento de imágenes | Dataset de entrenamiento cargado; carga de usuario pendiente |
-| 6 | Pipeline reproducible de datos y preprocessing | Índice y partición por grupos preparados |
-| 7 | CNN, entrenamiento y versionado de modelos | Pendiente |
-| 8 | Métricas, matriz de confusión y curvas | Pendiente |
-| 9 | Inferencia CNN integrada con FastAPI | Pendiente |
-| 10 | Interfaz funcional: Auth, dashboard, predicción e historial | Pendiente |
-| 11 | Integración end-to-end | Pendiente |
-| 12 | Pruebas funcionales, API y seguridad básica | Pendiente |
-| 13 | Documentación y preparación académica final | Pendiente |
+| 0 | Planificación y arquitectura | Completada |
+| 1 | Inicialización del repositorio | Completada |
+| 2 | Supabase y base de datos (sin usuarios) | Completada |
+| 3 | Backend base sin autenticación | Completada |
+| 4 | Gestión temporal de imágenes | Completada |
+| 5 | Pipeline ML CNN (TensorFlow/Keras) | Completada |
+| 6 | API de predicción `POST /predict` | Completada |
+| 7 | Frontend público e identidad visual UIS | Parcial |
+| 8 | Integración completa Frontend → FastAPI → CNN | Lista para verificación |
+| 9 | Pruebas y validación | En curso (20 tests OK) |
+| 10 | Documentación final | En actualización |
 
-## Criterios de avance
+## Decisiones vigentes
 
-- No avanzar de fase sin verificar el entregable de la fase activa.
-- No ejecutar SQL destructivo ni cambios externos sin revisión explícita.
-- No afirmar métricas del modelo hasta disponer de un dataset real y un experimento reproducible.
-- Mantener actualizados README y documentación cuando cambien decisiones relevantes.
+- Python oficial: **3.11**
+- Framework ML: **TensorFlow/Keras** (MobileNetV2 + transfer learning)
+- Artefacto: `ml/models/trained/active.keras`
+- Preprocess: `mobilenet_v2.preprocess_input`
+- Orden de clases: oficial del brief
+- Archivo PyTorch histórico: `ml/models/archive/pytorch-v1/`
 
-## Próxima fase: análisis autenticado
+## Modelo activo
 
-Validar el flujo de registro e inicio de sesión, comprobar GET /api/v1/auth/me con un JWT real y después implementar POST /api/v1/analyses con validación, Storage y persistencia por usuario.
+- Nombre: MicrostructureCNN  
+- Versión: **2.0**  
+- Framework: tensorflow  
+- Accuracy test: **~89.7%** (checkpoint `best_head`; el fine-tune degradó el resultado y no se usó en producción)
+
+## Próxima fase
+
+Pulir frontend (FASE 7) y cerrar documentación académica final.
