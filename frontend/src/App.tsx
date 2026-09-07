@@ -1,63 +1,41 @@
-import { useEffect, useState, type FormEvent } from 'react'
-import type { Session } from '@supabase/supabase-js'
+import { useEffect, useState } from 'react'
 
+import { ImageUploader } from './components/ImageUploader'
+import { PredictionResult } from './components/PredictionResult'
 import {
   fetchMicrostructureClasses,
+  predictMicrostructure,
+  toUserFacingError,
   type MicrostructureClass,
+  type PredictResponse,
 } from './lib/api'
-import { isSupabaseConfigured, supabase } from './lib/supabase'
 
-type AuthMode = 'sign-in' | 'sign-up'
-
-const capabilities = [
+const steps = [
   {
-    title: 'Carga de imágenes',
-    description: 'Prepara una micrografía para su análisis asistido.',
+    title: 'Carga una imagen',
+    description: 'Selecciona o arrastra una micrografía de acero al carbono.',
   },
   {
-    title: 'Clasificación CNN',
-    description: 'Obtén una hipótesis de microestructura y su confianza.',
+    title: 'Procesamiento',
+    description: 'El sistema valida y prepara la imagen para el modelo.',
   },
   {
-    title: 'Historial académico',
-    description: 'Consulta tus análisis y compara resultados con el tiempo.',
+    title: 'Análisis CNN',
+    description: 'La red neuronal estima la microestructura más probable.',
+  },
+  {
+    title: 'Resultado',
+    description: 'Obtienes la clase, la confianza y las probabilidades.',
   },
 ]
 
 function App() {
-  const [session, setSession] = useState<Session | null>(null)
-  const [authMode, setAuthMode] = useState<AuthMode>('sign-in')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [authMessage, setAuthMessage] = useState('')
-  const [authError, setAuthError] = useState('')
-  const [authLoading, setAuthLoading] = useState(false)
   const [classes, setClasses] = useState<MicrostructureClass[]>([])
   const [classesError, setClassesError] = useState('')
-
-  useEffect(() => {
-    if (!supabase) {
-      return
-    }
-
-    let mounted = true
-    void supabase.auth.getSession().then(({ data }) => {
-      if (mounted) {
-        setSession(data.session)
-      }
-    })
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession)
-    })
-
-    return () => {
-      mounted = false
-      subscription.unsubscribe()
-    }
-  }, [])
+  const [loading, setLoading] = useState(false)
+  const [analyzeError, setAnalyzeError] = useState('')
+  const [prediction, setPrediction] = useState<PredictResponse | null>(null)
+  const [resultPreviewUrl, setResultPreviewUrl] = useState<string | null>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -77,257 +55,204 @@ function App() {
     return () => controller.abort()
   }, [])
 
-  async function handleAuthSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setAuthError('')
-    setAuthMessage('')
-
-    if (!supabase) {
-      setAuthError('Configura las variables públicas de Supabase para continuar.')
-      return
+  useEffect(() => {
+    return () => {
+      if (resultPreviewUrl) {
+        URL.revokeObjectURL(resultPreviewUrl)
+      }
     }
+  }, [resultPreviewUrl])
 
-    setAuthLoading(true)
+  async function handleAnalyze(file: File) {
+    setLoading(true)
+    setAnalyzeError('')
+    setPrediction(null)
+
+    if (resultPreviewUrl) {
+      URL.revokeObjectURL(resultPreviewUrl)
+    }
+    const nextPreview = URL.createObjectURL(file)
+    setResultPreviewUrl(nextPreview)
+
     try {
-      const result =
-        authMode === 'sign-in'
-          ? await supabase.auth.signInWithPassword({ email, password })
-          : await supabase.auth.signUp({ email, password })
-
-      if (result.error) {
-        setAuthError(result.error.message)
-        return
-      }
-
-      if (authMode === 'sign-up' && !result.data.session) {
-        setAuthMessage('Revisa tu correo para confirmar la cuenta.')
-        return
-      }
-
-      setAuthMessage(
-        authMode === 'sign-in'
-          ? 'Sesión iniciada correctamente.'
-          : 'Cuenta creada correctamente.',
-      )
-      setPassword('')
+      const result = await predictMicrostructure(file)
+      setPrediction(result)
+      window.requestAnimationFrame(() => {
+        document.getElementById('resultado')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        })
+      })
     } catch (error: unknown) {
-      setAuthError(
-        error instanceof Error
-          ? error.message
-          : 'No se pudo conectar con Supabase Auth.',
-      )
+      setAnalyzeError(toUserFacingError(error))
     } finally {
-      setAuthLoading(false)
-    }
-  }
-
-  async function handleSignOut() {
-    if (!supabase) {
-      return
-    }
-
-    try {
-      const { error } = await supabase.auth.signOut()
-      if (error) {
-        setAuthError(error.message)
-        return
-      }
-      setAuthMessage('Sesión cerrada.')
-    } catch (error: unknown) {
-      setAuthError(
-        error instanceof Error
-          ? error.message
-          : 'No se pudo cerrar la sesión.',
-      )
+      setLoading(false)
     }
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100">
-      <section className="mx-auto flex min-h-screen max-w-6xl flex-col px-6 py-10 lg:px-12">
-        <nav className="flex items-center justify-between gap-4">
+    <main className="min-h-screen bg-slate-50 text-slate-900">
+      <header className="border-b border-emerald-900/10 bg-white">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4 lg:px-12">
           <div className="flex items-center gap-3">
-            <span className="grid h-10 w-10 place-items-center rounded-xl bg-copper font-bold text-white">
-              CS
+            <span className="grid h-10 w-10 place-items-center rounded-lg bg-uis-green font-bold text-white">
+              MV
             </span>
-            <span className="font-semibold tracking-wide">
-              CarbonSteelClassifier
-            </span>
-          </div>
-          {session ? (
-            <div className="flex items-center gap-3">
-              <span className="hidden text-sm text-slate-400 sm:inline">
-                {session.user.email}
-              </span>
-              <button
-                className="rounded-lg border border-slate-700 px-3 py-2 text-sm text-slate-300 transition hover:border-copper hover:text-white"
-                onClick={() => void handleSignOut()}
-                type="button"
-              >
-                Cerrar sesión
-              </button>
-            </div>
-          ) : (
-            <span className="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-400">
-              Fase 4 · Autenticación
-            </span>
-          )}
-        </nav>
-
-        <div className="grid flex-1 items-center gap-12 py-16 lg:grid-cols-[1.05fr_0.95fr]">
-          <div>
-            <p className="mb-5 text-sm font-semibold uppercase tracking-[0.25em] text-copper">
-              Metalurgia · IA · Aprendizaje
-            </p>
-            <h1 className="max-w-3xl text-5xl font-semibold leading-tight tracking-tight sm:text-6xl">
-              Comprende la microestructura del acero con apoyo de inteligencia
-              artificial.
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-400">
-              Una plataforma académica para explorar fases y microconstituyentes
-              en imágenes metalográficas mediante visión por computador.
-            </p>
-
-            {session ? (
-              <div className="mt-9 rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-5">
-                <p className="text-sm font-semibold text-emerald-300">
-                  Sesión autenticada
-                </p>
-                <p className="mt-2 text-sm text-slate-300">
-                  Tu cuenta ya puede utilizar los análisis protegidos del
-                  backend.
-                </p>
-              </div>
-            ) : (
-              <div className="mt-9 rounded-2xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-black/20">
-                <div className="mb-5 flex gap-2 rounded-lg bg-slate-800/70 p-1">
-                  <button
-                    className={`flex-1 rounded-md px-3 py-2 text-sm transition ${
-                      authMode === 'sign-in'
-                        ? 'bg-copper font-semibold text-white'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                    onClick={() => setAuthMode('sign-in')}
-                    type="button"
-                  >
-                    Iniciar sesión
-                  </button>
-                  <button
-                    className={`flex-1 rounded-md px-3 py-2 text-sm transition ${
-                      authMode === 'sign-up'
-                        ? 'bg-copper font-semibold text-white'
-                        : 'text-slate-400 hover:text-white'
-                    }`}
-                    onClick={() => setAuthMode('sign-up')}
-                    type="button"
-                  >
-                    Crear cuenta
-                  </button>
-                </div>
-
-                <h2 className="text-xl font-semibold">
-                  {authMode === 'sign-in'
-                    ? 'Acceso al laboratorio'
-                    : 'Registro académico'}
-                </h2>
-                <form className="mt-5 space-y-4" onSubmit={handleAuthSubmit}>
-                  <label className="block text-sm text-slate-300">
-                    Correo electrónico
-                    <input
-                      className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-copper"
-                      onChange={(event) => setEmail(event.target.value)}
-                      required
-                      type="email"
-                      value={email}
-                    />
-                  </label>
-                  <label className="block text-sm text-slate-300">
-                    Contraseña
-                    <input
-                      className="mt-2 w-full rounded-lg border border-slate-700 bg-slate-950 px-3 py-2.5 text-white outline-none transition focus:border-copper"
-                      minLength={6}
-                      onChange={(event) => setPassword(event.target.value)}
-                      required
-                      type="password"
-                      value={password}
-                    />
-                  </label>
-                  <button
-                    className="w-full rounded-lg bg-copper px-5 py-3 font-semibold text-white transition hover:bg-orange-500 disabled:cursor-not-allowed disabled:opacity-50"
-                    disabled={authLoading || !isSupabaseConfigured}
-                    type="submit"
-                  >
-                    {authLoading
-                      ? 'Procesando...'
-                      : authMode === 'sign-in'
-                        ? 'Iniciar sesión'
-                        : 'Crear cuenta'}
-                  </button>
-                </form>
-
-                {!isSupabaseConfigured && (
-                  <p className="mt-4 text-sm text-amber-300">
-                    Supabase aún no está configurado en las variables públicas
-                    del frontend.
-                  </p>
-                )}
-                {authError && (
-                  <p className="mt-4 text-sm text-rose-300">{authError}</p>
-                )}
-                {authMessage && (
-                  <p className="mt-4 text-sm text-emerald-300">{authMessage}</p>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="rounded-3xl border border-slate-800 bg-slate-900/80 p-6 shadow-2xl shadow-black/20">
-            <div className="mb-6 flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-400">Clases iniciales</p>
-                <p className="mt-1 text-3xl font-semibold">
-                  {classes.length} microestructuras
-                </p>
-              </div>
-              <span className="rounded-full bg-emerald-400/10 px-3 py-1 text-xs text-emerald-300">
-                Catálogo API
-              </span>
-            </div>
-            {classesError ? (
-              <p className="rounded-xl border border-rose-400/20 bg-rose-400/10 p-4 text-sm text-rose-300">
-                {classesError}
+            <div>
+              <p className="font-semibold tracking-wide text-uis-green">
+                MetalVision AI
               </p>
-            ) : (
-              <div className="space-y-3">
-                {classes.map((microstructureClass, index) => (
-                  <div
-                    className="flex items-center gap-3 rounded-xl bg-slate-800/70 px-4 py-3"
-                    key={microstructureClass.slug}
-                  >
-                    <span className="text-xs text-copper">
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
-                    <span className="text-sm text-slate-300">
-                      {microstructureClass.name}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+              <p className="text-xs text-slate-500">CarbonSteelClassifier</p>
+            </div>
           </div>
+          <nav className="hidden gap-6 text-sm text-slate-600 sm:flex">
+            <a className="hover:text-uis-green" href="#inicio">
+              Inicio
+            </a>
+            <a className="hover:text-uis-green" href="#analizar">
+              Analizar
+            </a>
+            <a className="hover:text-uis-green" href="#como-funciona">
+              ¿Cómo funciona?
+            </a>
+            <a className="hover:text-uis-green" href="#microestructuras">
+              Microestructuras
+            </a>
+          </nav>
         </div>
+      </header>
 
-        <div className="grid gap-4 border-t border-slate-800 pt-8 md:grid-cols-3">
-          {capabilities.map((capability) => (
-            <article key={capability.title}>
-              <h2 className="font-semibold">{capability.title}</h2>
-              <p className="mt-2 text-sm leading-6 text-slate-400">
-                {capability.description}
-              </p>
-            </article>
-          ))}
+      <section
+        className="relative overflow-hidden bg-gradient-to-br from-uis-green via-emerald-800 to-emerald-950 text-white"
+        id="inicio"
+      >
+        <div className="mx-auto max-w-6xl px-6 py-20 lg:px-12 lg:py-28">
+          <p className="mb-4 text-sm font-semibold uppercase tracking-[0.2em] text-emerald-200">
+            Universidad Industrial de Santander
+          </p>
+          <h1 className="max-w-3xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
+            Identificación inteligente de microestructuras en aceros al carbono
+          </h1>
+          <p className="mt-5 max-w-2xl text-lg leading-8 text-emerald-50/90">
+            Analiza imágenes metalográficas mediante Inteligencia Artificial y
+            Redes Neuronales Convolucionales. Acceso directo, sin registro.
+          </p>
+          <a
+            className="mt-8 inline-flex rounded-lg bg-white px-5 py-3 text-sm font-semibold text-uis-green transition hover:bg-emerald-50"
+            href="#analizar"
+          >
+            Analizar microestructura
+          </a>
         </div>
       </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-16 lg:px-12" id="analizar">
+        <h2 className="text-2xl font-semibold text-uis-green">
+          Cargar imagen metalográfica
+        </h2>
+        <p className="mt-2 max-w-2xl text-slate-600">
+          Sube una micrografía para validarla y prepararla. La predicción con la
+          CNN se activará cuando el modelo esté integrado.
+        </p>
+
+        <div className="mt-8">
+          <ImageUploader
+            loading={loading}
+            onAnalyze={(file) => {
+              void handleAnalyze(file)
+            }}
+            onClearResult={() => {
+              setAnalyzeError('')
+              setPrediction(null)
+            }}
+          />
+        </div>
+
+        {analyzeError && (
+          <p className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+            {analyzeError}
+          </p>
+        )}
+
+        {prediction && (
+          <PredictionResult
+            classes={classes}
+            prediction={prediction}
+            previewUrl={resultPreviewUrl}
+          />
+        )}
+      </section>
+
+      <section
+        className="border-y border-emerald-900/5 bg-white"
+        id="como-funciona"
+      >
+        <div className="mx-auto max-w-6xl px-6 py-16 lg:px-12">
+          <h2 className="text-2xl font-semibold text-uis-green">
+            ¿Cómo funciona?
+          </h2>
+          <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            {steps.map((step, index) => (
+              <article key={step.title}>
+                <p className="text-sm font-semibold text-emerald-600">
+                  Paso {index + 1}
+                </p>
+                <h3 className="mt-2 font-semibold">{step.title}</h3>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  {step.description}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section
+        className="mx-auto max-w-6xl px-6 py-16 lg:px-12"
+        id="microestructuras"
+      >
+        <h2 className="text-2xl font-semibold text-uis-green">
+          Microestructuras reconocidas
+        </h2>
+        <p className="mt-2 text-slate-600">
+          Siete clases oficiales en el orden de entrenamiento del modelo.
+        </p>
+        {classesError ? (
+          <p className="mt-6 rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+            {classesError}
+          </p>
+        ) : (
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {classes.map((microstructureClass, index) => (
+              <article
+                className="rounded-xl border border-emerald-100 bg-white px-4 py-4"
+                key={microstructureClass.slug}
+              >
+                <p className="text-xs font-semibold text-emerald-700">
+                  {String(index + 1).padStart(2, '0')}
+                </p>
+                <h3 className="mt-1 font-medium text-slate-900">
+                  {microstructureClass.name}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                  {microstructureClass.scientific_description}
+                </p>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+
+      <footer className="border-t border-emerald-900/10 bg-uis-green text-emerald-50">
+        <div className="mx-auto max-w-6xl px-6 py-10 text-sm leading-7 lg:px-12">
+          <p className="font-semibold text-white">Proyecto académico</p>
+          <p>Ingeniería Metalúrgica y Ciencia de Materiales</p>
+          <p>Universidad Industrial de Santander</p>
+          <p className="mt-3 text-emerald-100/80">
+            React · FastAPI · CNN · Supabase
+          </p>
+        </div>
+      </footer>
     </main>
   )
 }
