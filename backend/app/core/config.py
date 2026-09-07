@@ -2,14 +2,24 @@
 
 from functools import lru_cache
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+def _strip_optional(value: str | None) -> str | None:
+    """Normalize optional env strings that may include spaces or quotes."""
+
+    if value is None:
+        return None
+    cleaned = value.strip().strip("'").strip('"').strip()
+    return cleaned or None
 
 
 class Settings(BaseSettings):
     """Runtime settings for the API.
 
-    Secrets are intentionally optional during Phase 1 so the health endpoint can
-    run before a Supabase project has been configured.
+    Supabase secrets are optional for local health checks; prediction stats and
+    model registry require the service-role key on the backend only.
     """
 
     app_name: str = "CarbonSteelClassifier API"
@@ -21,6 +31,7 @@ class Settings(BaseSettings):
     supabase_service_role_key: str | None = None
     supabase_storage_bucket: str = "microstructure-images"
     model_path: str = "../ml/models/trained/active.keras"
+    enable_prediction_logging: bool = True
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -28,6 +39,18 @@ class Settings(BaseSettings):
         extra="ignore",
         case_sensitive=False,
     )
+
+    @field_validator(
+        "supabase_url",
+        "supabase_anon_key",
+        "supabase_service_role_key",
+        mode="before",
+    )
+    @classmethod
+    def normalize_optional_secrets(cls, value: object) -> str | None:
+        if value is None:
+            return None
+        return _strip_optional(str(value))
 
     @property
     def cors_origin_list(self) -> list[str]:
