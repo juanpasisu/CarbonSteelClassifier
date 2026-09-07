@@ -1,0 +1,40 @@
+{
+  "ordering": "alphabetical_by_name",
+  "classes": [
+    {
+      "index": 0,
+      "slug": "austenita",
+      "name": "Austenita"
+    },
+    {
+      "index": 1,
+      "slug": "cementita-perlita",
+      "name": "Cementita + Perlita"
+    },
+    {
+      "index": 2,
+      "slug": "ferrita",
+      "name": "Ferrita"
+    },
+    {
+      "index": 3,
+      "slug": "martensita",
+      "name": "Martensita"
+    },
+    {
+      "index": 4,
+      "slug": "perlita",
+      "name": "Perlita"
+    },
+    {
+      "index": 5,
+      "slug": "perlita-ferrita-equiaxial",
+      "name": "Perlita + Ferrita Equiaxial"
+    },
+    {
+      "index": 6,
+      "slug": "perlita-ferrita-widmanstatten",
+      "name": "Perlita + Ferrita Widmanstätten"
+    }
+  ]
+}

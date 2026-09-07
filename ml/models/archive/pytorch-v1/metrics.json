@@ -1,0 +1,281 @@
+{
+  "metrics": {
+    "accuracy": 0.9693593314763231,
+    "macro_f1": 0.9667840198012613,
+    "weighted_f1": 0.9688787565300389,
+    "classification_report": {
+      "Austenita": {
+        "precision": 1.0,
+        "recall": 0.9772727272727273,
+        "f1-score": 0.9885057471264368,
+        "support": 44.0
+      },
+      "Cementita + Perlita": {
+        "precision": 0.9545454545454546,
+        "recall": 0.9545454545454546,
+        "f1-score": 0.9545454545454546,
+        "support": 44.0
+      },
+      "Ferrita": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 48.0
+      },
+      "Martensita": {
+        "precision": 0.8813559322033898,
+        "recall": 1.0,
+        "f1-score": 0.9369369369369369,
+        "support": 52.0
+      },
+      "Perlita": {
+        "precision": 1.0,
+        "recall": 0.8181818181818182,
+        "f1-score": 0.9,
+        "support": 44.0
+      },
+      "Perlita + Ferrita Equiaxial": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1-score": 1.0,
+        "support": 48.0
+      },
+      "Perlita + Ferrita Widmanst\u00e4tten": {
+        "precision": 0.9753086419753086,
+        "recall": 1.0,
+        "f1-score": 0.9875,
+        "support": 79.0
+      },
+      "accuracy": 0.9693593314763231,
+      "macro avg": {
+        "precision": 0.9730300041034504,
+        "recall": 0.9642857142857143,
+        "f1-score": 0.9667840198012613,
+        "support": 359.0
+      },
+      "weighted avg": {
+        "precision": 0.971810281868038,
+        "recall": 0.9693593314763231,
+        "f1-score": 0.9688787565300389,
+        "support": 359.0
+      }
+    },
+    "confusion_matrix": [
+      [
+        43,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        42,
+        0,
+        1,
+        0,
+        0,
+        1
+      ],
+      [
+        0,
+        0,
+        48,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        52,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        2,
+        0,
+        6,
+        36,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        48,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        79
+      ]
+    ],
+    "class_names": [
+      "Austenita",
+      "Cementita + Perlita",
+      "Ferrita",
+      "Martensita",
+      "Perlita",
+      "Perlita + Ferrita Equiaxial",
+      "Perlita + Ferrita Widmanst\u00e4tten"
+    ]
+  },
+  "training": {
+    "device": "cpu",
+    "seed": 42,
+    "batch_size": 32,
+    "epochs_configured": 18,
+    "epochs_ran": 18,
+    "best_val_accuracy": 0.9798270893371758,
+    "partition_sizes": {
+      "train": 1698,
+      "validation": 347,
+      "test": 359
+    },
+    "history": [
+      {
+        "epoch": 1.0,
+        "train_loss": 1.1058429506277168,
+        "train_accuracy": 0.6289752650176679,
+        "val_loss": 0.850307807798688,
+        "val_accuracy": 0.723342939481268
+      },
+      {
+        "epoch": 2.0,
+        "train_loss": 0.5952353758300853,
+        "train_accuracy": 0.8109540636042403,
+        "val_loss": 0.6283389177033812,
+        "val_accuracy": 0.7694524495677233
+      },
+      {
+        "epoch": 3.0,
+        "train_loss": 0.4586369259759029,
+        "train_accuracy": 0.8492343934040048,
+        "val_loss": 0.5416491667200578,
+        "val_accuracy": 0.8155619596541787
+      },
+      {
+        "epoch": 4.0,
+        "train_loss": 0.3939695619441595,
+        "train_accuracy": 0.8810365135453475,
+        "val_loss": 0.5021874969905666,
+        "val_accuracy": 0.792507204610951
+      },
+      {
+        "epoch": 5.0,
+        "train_loss": 0.3517848157068304,
+        "train_accuracy": 0.8857479387514723,
+        "val_loss": 0.5010422657133866,
+        "val_accuracy": 0.8126801152737753
+      },
+      {
+        "epoch": 6.0,
+        "train_loss": 0.31849753568815536,
+        "train_accuracy": 0.8945818610129564,
+        "val_loss": 0.4141316254132076,
+        "val_accuracy": 0.8501440922190202
+      },
+      {
+        "epoch": 7.0,
+        "train_loss": 0.2945272773679771,
+        "train_accuracy": 0.908716136631331,
+        "val_loss": 0.42525271328450626,
+        "val_accuracy": 0.8530259365994236
+      },
+      {
+        "epoch": 8.0,
+        "train_loss": 0.27242133309198074,
+        "train_accuracy": 0.9134275618374559,
+        "val_loss": 0.38166764868095904,
+        "val_accuracy": 0.8731988472622478
+      },
+      {
+        "epoch": 9.0,
+        "train_loss": 0.24488978553014876,
+        "train_accuracy": 0.9275618374558304,
+        "val_loss": 0.3582338809279956,
+        "val_accuracy": 0.8645533141210374
+      },
+      {
+        "epoch": 10.0,
+        "train_loss": 0.23551383260001282,
+        "train_accuracy": 0.9299175500588928,
+        "val_loss": 0.36010627564504444,
+        "val_accuracy": 0.8703170028818443
+      },
+      {
+        "epoch": 11.0,
+        "train_loss": 0.2348398256989896,
+        "train_accuracy": 0.9240282685512368,
+        "val_loss": 0.3462665314633152,
+        "val_accuracy": 0.8674351585014409
+      },
+      {
+        "epoch": 12.0,
+        "train_loss": 0.22511096303960038,
+        "train_accuracy": 0.9240282685512368,
+        "val_loss": 0.3320449879258785,
+        "val_accuracy": 0.8876080691642652
+      },
+      {
+        "epoch": 13.0,
+        "train_loss": 0.1802593290244171,
+        "train_accuracy": 0.9375736160188457,
+        "val_loss": 0.14472572166225753,
+        "val_accuracy": 0.9452449567723343
+      },
+      {
+        "epoch": 14.0,
+        "train_loss": 0.09052542898939973,
+        "train_accuracy": 0.9717314487632509,
+        "val_loss": 0.2116137409330445,
+        "val_accuracy": 0.9337175792507204
+      },
+      {
+        "epoch": 15.0,
+        "train_loss": 0.041879777830572375,
+        "train_accuracy": 0.9858657243816255,
+        "val_loss": 0.10810267327283576,
+        "val_accuracy": 0.9394812680115274
+      },
+      {
+        "epoch": 16.0,
+        "train_loss": 0.03722535838560586,
+        "train_accuracy": 0.9870435806831567,
+        "val_loss": 0.09668998267791457,
+        "val_accuracy": 0.9654178674351584
+      },
+      {
+        "epoch": 17.0,
+        "train_loss": 0.0604802916864168,
+        "train_accuracy": 0.980565371024735,
+        "val_loss": 0.07053723295758711,
+        "val_accuracy": 0.9769452449567724
+      },
+      {
+        "epoch": 18.0,
+        "train_loss": 0.02396048766915172,
+        "train_accuracy": 0.9929328621908127,
+        "val_loss": 0.09425895591601945,
+        "val_accuracy": 0.9798270893371758
+      }
+    ],
+    "framework": "pytorch",
+    "backbone": "mobilenet_v2"
+  }
+}

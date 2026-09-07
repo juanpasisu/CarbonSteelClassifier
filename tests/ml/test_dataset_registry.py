@@ -8,11 +8,11 @@ def test_registry_contains_the_seven_confirmed_classes() -> None:
     assert [item["slug"] for item in get_class_registry()] == [
         "austenita",
         "ferrita",
-        "martensita",
         "perlita",
-        "perlita-cementita",
-        "perlita-ferrita-equiaxial",
+        "cementita-perlita",
         "perlita-ferrita-widmanstatten",
+        "perlita-ferrita-equiaxial",
+        "martensita",
     ]
 
 

@@ -37,11 +37,16 @@ ml/models/checkpoints/*
 ml/models/trained/*
 !ml/models/checkpoints/.gitkeep
 !ml/models/trained/.gitkeep
+.uv-cache/
+.tmp/
+.venv-py314-backup/
 uploads/
 *.h5
 *.keras
 *.ckpt
 *.onnx
+*.pt
+*.pth
 
 # Editors and operating systems
 .vscode/
