@@ -1,85 +1,132 @@
-import { useEffect, useId, useRef, useState, type ChangeEvent, type DragEvent } from 'react'
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type DragEvent,
+} from 'react'
 
-const ACCEPTED_TYPES = new Set([
-  'image/jpeg',
-  'image/png',
-  'image/webp',
-  'image/tiff',
-])
-const MAX_BYTES = 25 * 1024 * 1024
+import { usePreferences } from '../i18n/PreferencesContext'
+import type { MessageKey } from '../i18n/messages'
+import {
+  MAX_BATCH_IMAGES,
+  buildImageBatch,
+  type FileValidationReason,
+  type SkippedFile,
+} from '../lib/imageUpload'
+
+export interface SelectedImage {
+  id: string
+  file: File
+  previewUrl: string
+}
 
 interface ImageUploaderProps {
   disabled?: boolean
   loading?: boolean
-  onAnalyze: (file: File) => void
+  progressLabel?: string
+  maxFiles?: number
+  submitLabelKey?: MessageKey
+  onAnalyze: (files: File[]) => void
   onClearResult?: () => void
 }
 
-function validateSelectedFile(file: File): string | null {
-  if (!ACCEPTED_TYPES.has(file.type) && !/\.(jpe?g|png|webp|tiff?)$/i.test(file.name)) {
-    return 'Formato no soportado. Usa JPG, PNG, WEBP o TIFF.'
+function createSelectedImages(files: File[]): SelectedImage[] {
+  return files.map((file, index) => ({
+    id: `${file.name}-${file.size}-${file.lastModified}-${index}`,
+    file,
+    previewUrl: URL.createObjectURL(file),
+  }))
+}
+
+function revokeAll(images: SelectedImage[]) {
+  for (const image of images) {
+    URL.revokeObjectURL(image.previewUrl)
   }
-  if (file.size <= 0 || file.size > MAX_BYTES) {
-    return 'El archivo debe pesar entre 1 byte y 25 MB.'
+}
+
+function reasonMessageKey(
+  reason: FileValidationReason,
+): Extract<
+  MessageKey,
+  | 'uploader.error.unsupported'
+  | 'uploader.error.size'
+  | 'uploader.error.batchLimit'
+> {
+  if (reason === 'unsupported_format') {
+    return 'uploader.error.unsupported'
   }
-  return null
+  if (reason === 'invalid_size') {
+    return 'uploader.error.size'
+  }
+  return 'uploader.error.batchLimit'
 }
 
 export function ImageUploader({
   disabled = false,
   loading = false,
+  progressLabel,
+  maxFiles = MAX_BATCH_IMAGES,
+  submitLabelKey,
   onAnalyze,
   onClearResult,
 }: ImageUploaderProps) {
+  const { t, locale } = usePreferences()
   const inputId = useId()
   const inputRef = useRef<HTMLInputElement>(null)
-  const [file, setFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [images, setImages] = useState<SelectedImage[]>([])
   const [localError, setLocalError] = useState('')
   const [isDragging, setIsDragging] = useState(false)
+  const batchLimit = Math.max(1, Math.min(maxFiles, MAX_BATCH_IMAGES))
 
   useEffect(() => {
-    return () => {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
-      }
-    }
-  }, [previewUrl])
+    return () => revokeAll(images)
+    // Intentionally only on unmount; replacements revoke explicitly.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  function selectFile(nextFile: File | null) {
-    setLocalError('')
+  function formatSkipped(skipped: SkippedFile[]): string[] {
+    return skipped.map((item) => {
+      const detail = t(reasonMessageKey(item.reason), { max: batchLimit })
+      return `${item.name}: ${detail}`
+    })
+  }
+
+  function replaceImages(nextFiles: File[], skipped: SkippedFile[]) {
+    setImages((current) => {
+      revokeAll(current)
+      return createSelectedImages(nextFiles)
+    })
     onClearResult?.()
 
-    if (!nextFile) {
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
-      }
-      setFile(null)
-      setPreviewUrl(null)
+    const details = formatSkipped(skipped)
+    if (nextFiles.length === 0 && details.length > 0) {
+      setLocalError(details.join(' '))
       return
     }
-
-    const validationError = validateSelectedFile(nextFile)
-    if (validationError) {
-      setLocalError(validationError)
-      setFile(null)
-      if (previewUrl) {
-        URL.revokeObjectURL(previewUrl)
-      }
-      setPreviewUrl(null)
+    if (details.length > 0) {
+      setLocalError(
+        t('uploader.skipped', {
+          count: details.length,
+          details: details.slice(0, 3).join(' '),
+        }),
+      )
       return
     }
+    setLocalError('')
+  }
 
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl)
-    }
-    setFile(nextFile)
-    setPreviewUrl(URL.createObjectURL(nextFile))
+  function handleIncomingFiles(fileList: FileList | File[]) {
+    const { files, skipped } = buildImageBatch(fileList, batchLimit)
+    replaceImages(files, skipped)
   }
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
-    const nextFile = event.target.files?.[0] ?? null
-    selectFile(nextFile)
+    const list = event.target.files
+    if (list && list.length > 0) {
+      handleIncomingFiles(list)
+    }
     event.target.value = ''
   }
 
@@ -89,18 +136,47 @@ export function ImageUploader({
     if (disabled || loading) {
       return
     }
-    const nextFile = event.dataTransfer.files?.[0] ?? null
-    selectFile(nextFile)
+    if (event.dataTransfer.files?.length) {
+      handleIncomingFiles(event.dataTransfer.files)
+    }
+  }
+
+  function removeImage(id: string) {
+    setImages((current) => {
+      const target = current.find((image) => image.id === id)
+      if (target) {
+        URL.revokeObjectURL(target.previewUrl)
+      }
+      const next = current.filter((image) => image.id !== id)
+      if (next.length === 0) {
+        onClearResult?.()
+      }
+      return next
+    })
+    setLocalError('')
+  }
+
+  function clearAll() {
+    setImages((current) => {
+      revokeAll(current)
+      return []
+    })
+    onClearResult?.()
+    setLocalError('')
   }
 
   return (
     <div>
       <div
-        className={`rounded-2xl border-2 border-dashed bg-white px-6 py-10 text-center transition ${
-          isDragging
-            ? 'border-uis-green bg-uis-green-soft'
-            : 'border-emerald-200'
+        className={`rounded-2xl border-2 border-dashed px-4 py-8 text-center transition sm:px-6 sm:py-10 ${
+          isDragging ? 'border-uis-green' : ''
         }`}
+        style={{
+          background: isDragging
+            ? 'var(--mv-accent-soft)'
+            : 'var(--mv-surface)',
+          borderColor: isDragging ? undefined : 'var(--mv-border)',
+        }}
         onDragEnter={(event) => {
           event.preventDefault()
           setIsDragging(true)
@@ -112,17 +188,18 @@ export function ImageUploader({
         onDragOver={(event) => event.preventDefault()}
         onDrop={handleDrop}
       >
-        <p className="text-lg font-medium text-slate-800">
-          Arrastra una imagen o selecciónala desde tu equipo
+        <p className="text-base font-medium sm:text-lg" style={{ color: 'var(--mv-text)' }}>
+          {t('uploader.dropTitle')}
         </p>
-        <p className="mt-2 text-sm text-slate-500">
-          Formatos: JPG, PNG, WEBP, TIFF · máximo 25 MB · sin almacenamiento permanente
+        <p className="mt-2 text-sm mv-text-muted">
+          {t('uploader.dropHint', { max: batchLimit })}
         </p>
 
         <input
           accept=".jpg,.jpeg,.png,.webp,.tif,.tiff,image/jpeg,image/png,image/webp,image/tiff"
           className="sr-only"
           id={inputId}
+          multiple={batchLimit > 1}
           onChange={handleInputChange}
           ref={inputRef}
           type="file"
@@ -130,50 +207,98 @@ export function ImageUploader({
 
         <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <label
-            className={`cursor-pointer rounded-lg border border-uis-green px-5 py-3 text-sm font-semibold text-uis-green transition hover:bg-uis-green-soft ${
+            className={`cursor-pointer rounded-lg border border-uis-green px-5 py-3 text-sm font-semibold text-uis-green transition hover:bg-uis-green-soft dark:hover:bg-emerald-950 ${
               disabled || loading ? 'pointer-events-none opacity-50' : ''
             }`}
             htmlFor={inputId}
           >
-            Seleccionar imagen
+            {t('uploader.select')}
           </label>
           <button
             className="rounded-lg bg-uis-green px-5 py-3 text-sm font-semibold text-white transition hover:bg-emerald-800 disabled:cursor-not-allowed disabled:opacity-50"
-            disabled={!file || disabled || loading}
-            onClick={() => {
-              if (file) {
-                onAnalyze(file)
-              }
-            }}
+            disabled={images.length === 0 || disabled || loading}
+            onClick={() => onAnalyze(images.map((image) => image.file))}
             type="button"
           >
-            {loading ? 'Analizando…' : 'Analizar microestructura'}
+            {loading
+              ? progressLabel || t('uploader.analyzing')
+              : submitLabelKey
+                ? t(submitLabelKey)
+                : images.length > 1
+                  ? t('uploader.analyzeMany', { count: images.length })
+                  : t('uploader.analyzeOne')}
           </button>
         </div>
 
-        {previewUrl && file && (
-          <div className="mx-auto mt-8 max-w-md text-left">
-            <p className="mb-2 text-sm font-medium text-slate-700">Vista previa</p>
-            <img
-              alt={`Vista previa de ${file.name}`}
-              className="max-h-72 w-full rounded-xl object-contain bg-slate-100"
-              src={previewUrl}
-            />
-            <p className="mt-2 truncate text-xs text-slate-500">{file.name}</p>
-            <button
-              className="mt-3 text-sm text-uis-green underline-offset-2 hover:underline"
-              disabled={loading}
-              onClick={() => selectFile(null)}
-              type="button"
-            >
-              Quitar imagen
-            </button>
+        {images.length > 0 && (
+          <div className="mx-auto mt-8 max-w-4xl text-left">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <p className="text-sm font-medium" style={{ color: 'var(--mv-text)' }}>
+                {t('uploader.preview', {
+                  count: images.length,
+                  unit:
+                    locale === 'es'
+                      ? images.length === 1
+                        ? 'imagen'
+                        : 'imágenes'
+                      : images.length === 1
+                        ? 'image'
+                        : 'images',
+                })}
+              </p>
+              <button
+                className="text-sm underline-offset-2 hover:underline disabled:opacity-50"
+                disabled={loading}
+                onClick={clearAll}
+                style={{ color: 'var(--mv-accent)' }}
+                type="button"
+              >
+                {t('uploader.removeAll')}
+              </button>
+            </div>
+            <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {images.map((image, index) => (
+                <li
+                  className="rounded-xl border p-3"
+                  key={image.id}
+                  style={{
+                    background: 'var(--mv-surface-muted)',
+                    borderColor: 'var(--mv-border)',
+                  }}
+                >
+                  <p
+                    className="mb-2 text-xs font-semibold"
+                    style={{ color: 'var(--mv-accent)' }}
+                  >
+                    #{String(index + 1).padStart(2, '0')}
+                  </p>
+                  <img
+                    alt={image.file.name}
+                    className="h-36 w-full rounded-lg object-contain"
+                    src={image.previewUrl}
+                    style={{ background: 'var(--mv-surface)' }}
+                  />
+                  <p className="mt-2 truncate text-xs mv-text-muted">
+                    {image.file.name}
+                  </p>
+                  <button
+                    className="mt-2 text-xs underline-offset-2 hover:underline disabled:opacity-50"
+                    disabled={loading}
+                    onClick={() => removeImage(image.id)}
+                    style={{ color: 'var(--mv-accent)' }}
+                    type="button"
+                  >
+                    {t('uploader.remove')}
+                  </button>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
       </div>
 
       {localError && (
-        <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+        <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
           {localError}
         </p>
       )}

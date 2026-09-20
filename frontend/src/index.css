@@ -3,11 +3,34 @@
 @tailwind utilities;
 
 :root {
+  --mv-bg: #f4f7f5;
+  --mv-surface: #ffffff;
+  --mv-surface-muted: #eef3f0;
+  --mv-border: #d7e8de;
+  --mv-text: #0f172a;
+  --mv-text-muted: #547063;
+  --mv-accent: #2bb673;
+  --mv-accent-soft: #e3f8ec;
   font-family: "Source Sans 3", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
   color-scheme: light;
-  background: #f8fafc;
+  background: var(--mv-bg);
+  color: var(--mv-text);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
+}
+
+html.dark {
+  --mv-bg: #07110d;
+  --mv-surface: #0f1c17;
+  --mv-surface-muted: #12241c;
+  --mv-border: #1f3d30;
+  --mv-text: #e8f2ec;
+  --mv-text-muted: #9bb5a8;
+  --mv-accent: #4ade80;
+  --mv-accent-soft: #123528;
+  color-scheme: dark;
+  background: var(--mv-bg);
+  color: var(--mv-text);
 }
 
 * {
@@ -17,8 +40,196 @@
 body {
   margin: 0;
   min-width: 320px;
+  background: var(--mv-bg);
+  color: var(--mv-text);
 }
 
 html {
   scroll-behavior: smooth;
+}
+
+.mv-surface {
+  background: var(--mv-surface);
+  color: var(--mv-text);
+}
+
+.mv-surface-muted {
+  background: var(--mv-surface-muted);
+  color: var(--mv-text);
+}
+
+.mv-border {
+  border-color: var(--mv-border);
+}
+
+.mv-text-muted {
+  color: var(--mv-text-muted);
+}
+
+.mv-accent {
+  color: var(--mv-accent);
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes soft-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes pulse-ring {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(1.04);
+  }
+}
+
+.animate-rise {
+  animation: rise-in 0.7s ease-out both;
+}
+
+.animate-rise-delay {
+  animation: rise-in 0.8s ease-out 0.12s both;
+}
+
+.animate-rise-delay-2 {
+  animation: rise-in 0.85s ease-out 0.24s both;
+}
+
+.animate-float {
+  animation: soft-float 6s ease-in-out infinite;
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 5s ease-in-out infinite;
+}
+
+.hero-mesh {
+  position: relative;
+  background:
+    linear-gradient(
+      105deg,
+      #04140f 0%,
+      #062419 42%,
+      rgba(6, 36, 25, 0.72) 62%,
+      rgba(6, 36, 25, 0.28) 82%,
+      rgba(6, 36, 25, 0.12) 100%
+    ),
+    url("/samples/hero-perlita.png") right center / cover no-repeat;
+}
+
+.hero-demo-card {
+  background: var(--mv-surface);
+  color: var(--mv-text);
+  border: 1px solid var(--mv-border);
+}
+
+.level-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.level-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(5, 61, 42, 0.12);
+}
+
+html.dark .level-card:hover {
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+.babilla-mascot {
+  animation: babilla-bob 2.8s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+
+.babilla-cheer {
+  animation: babilla-cheer 0.7s ease-in-out infinite alternate;
+}
+
+.babilla-think {
+  animation: babilla-think 2.4s ease-in-out infinite;
+}
+
+.babilla-nudge {
+  animation: babilla-nudge 2.2s ease-in-out infinite;
+}
+
+@keyframes babilla-bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes babilla-cheer {
+  from {
+    transform: translateY(0) rotate(-4deg) scale(1);
+  }
+  to {
+    transform: translateY(-10px) rotate(4deg) scale(1.04);
+  }
+}
+
+@keyframes babilla-think {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-4px) rotate(-3deg);
+  }
+}
+
+@keyframes babilla-nudge {
+  0%,
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+  40% {
+    transform: translateY(-6px) translateX(-3px);
+  }
+  70% {
+    transform: translateY(-2px) translateX(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .babilla-mascot,
+  .babilla-cheer,
+  .babilla-think,
+  .babilla-nudge {
+    animation: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-rise,
+  .animate-rise-delay,
+  .animate-rise-delay-2,
+  .animate-float,
+  .animate-pulse-ring {
+    animation: none;
+  }
 }
