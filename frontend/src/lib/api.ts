@@ -1,3 +1,6 @@
+import type { Locale, MessageKey } from '../i18n/messages'
+import { translate } from '../i18n/messages'
+
 const apiBaseUrl = (
   import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
 ).replace(/\/+$/, '')
@@ -13,10 +16,17 @@ export interface ClassProbability {
   probability: number
 }
 
+export interface IdentifiedPhase {
+  slug: string
+  name: string
+  present: boolean
+}
+
 export interface PredictResponse {
   predicted_class: string
   confidence: number
   probabilities: ClassProbability[]
+  identified_phases?: IdentifiedPhase[]
   model: {
     name: string
     version: string
@@ -78,20 +88,41 @@ async function readErrorDetail(response: Response): Promise<string> {
   return `API request failed with status ${response.status}.`
 }
 
-export function toUserFacingError(error: unknown): string {
+function isNetworkError(error: unknown): boolean {
+  if (!(error instanceof Error)) {
+    return false
+  }
+  const message = error.message.toLowerCase()
+  return (
+    error.name === 'TypeError' ||
+    message.includes('failed to fetch') ||
+    message.includes('networkerror') ||
+    message.includes('load failed')
+  )
+}
+
+export function toUserFacingError(
+  error: unknown,
+  locale: Locale = 'es',
+): string {
+  const t = (key: MessageKey) => translate(locale, key)
+
   if (error instanceof ApiError) {
     if (error.status === 400) {
-      return 'La imagen no es válida. Verifica el formato, el tamaño (máx. 25 MB) y que el archivo no esté dañado.'
+      return t('error.invalidImage')
     }
     if (error.status === 503) {
-      return 'El análisis aún no está disponible. El modelo CNN se integrará en una fase posterior.'
+      return t('error.modelUnavailable')
     }
-    return 'No se pudo completar el análisis. Intenta de nuevo en unos momentos.'
+    return t('error.analyzeFailed')
+  }
+  if (isNetworkError(error)) {
+    return t('error.apiUnreachable')
   }
   if (error instanceof Error) {
     return error.message
   }
-  return 'Ocurrió un error inesperado.'
+  return t('error.unexpected')
 }
 
 export async function fetchMicrostructureClasses(
@@ -110,12 +141,31 @@ export async function fetchMicrostructureClasses(
   return payload
 }
 
+function mimeFromFileName(name: string): string | undefined {
+  const match = name.toLowerCase().match(/\.(jpe?g|png|webp|tiff?)$/)
+  if (!match) {
+    return undefined
+  }
+  if (match[1] === 'jpg' || match[1] === 'jpeg') {
+    return 'image/jpeg'
+  }
+  if (match[1] === 'tif' || match[1] === 'tiff') {
+    return 'image/tiff'
+  }
+  return `image/${match[1]}`
+}
+
 export async function predictMicrostructure(
   file: File,
   signal?: AbortSignal,
 ): Promise<PredictResponse> {
   const body = new FormData()
-  body.append('file', file)
+  const contentType = file.type || mimeFromFileName(file.name)
+  const upload =
+    contentType && contentType !== file.type
+      ? new File([file], file.name, { type: contentType, lastModified: file.lastModified })
+      : file
+  body.append('file', upload)
 
   const response = await fetch(`${apiBaseUrl}/api/v1/predict`, {
     method: 'POST',
