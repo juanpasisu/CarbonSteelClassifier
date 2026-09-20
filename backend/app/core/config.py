@@ -25,7 +25,10 @@ class Settings(BaseSettings):
     app_name: str = "CarbonSteelClassifier API"
     backend_host: str = "127.0.0.1"
     backend_port: int = 8000
-    cors_origins: str = "http://localhost:5173"
+    cors_origins: str = (
+        "http://localhost:5173,http://127.0.0.1:5173,"
+        "http://localhost:4173,http://127.0.0.1:4173"
+    )
     supabase_url: str | None = None
     supabase_anon_key: str | None = None
     supabase_service_role_key: str | None = None
