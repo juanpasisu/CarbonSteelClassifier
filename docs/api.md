@@ -22,7 +22,7 @@ Consulta el modelo activo. Mientras no haya modelo cargado, responde con estado 
 
 ### POST /api/v1/predict
 
-Recibe una imagen (`multipart/form-data`, campo `file`), la valida, la preprocesa en memoria (224×224 RGB, normalización [0, 1]) y ejecuta la CNN.
+Recibe una imagen (`multipart/form-data`, campo `file`), la valida, la preprocesa en memoria (224×224 RGB, `mobilenet_v2.preprocess_input`) y ejecuta la CNN. Además de la clase morfológica de siete etiquetas, responde la presencia/ausencia de ferrita, perlita y cementita.
 
 Respuesta esperada cuando el modelo esté disponible:
 
@@ -34,6 +34,11 @@ Respuesta esperada cuando el modelo esté disponible:
     { "class": "Austenita", "probability": 0.004 },
     { "class": "Cementita + Perlita", "probability": 0.002 },
     { "class": "Ferrita", "probability": 0.942 }
+  ],
+  "identified_phases": [
+    { "slug": "ferrita", "name": "Ferrita", "present": true },
+    { "slug": "perlita", "name": "Perlita", "present": false },
+    { "slug": "cementita", "name": "Cementita", "present": false }
   ],
   "model": {
     "name": "MicrostructureCNN",

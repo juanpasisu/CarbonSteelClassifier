@@ -20,12 +20,21 @@ class ModelInfo(BaseModel):
     framework: str = "TensorFlow/Keras"
 
 
+class PhasePresence(BaseModel):
+    """Presence or absence of ferrite, pearlite or cementite."""
+
+    slug: str
+    name: str
+    present: bool
+
+
 class PredictResponse(BaseModel):
     """Successful CNN prediction payload."""
 
     predicted_class: str
     confidence: float
     probabilities: list[ClassProbability]
+    identified_phases: list[PhasePresence] = Field(default_factory=list)
     model: ModelInfo
 
 

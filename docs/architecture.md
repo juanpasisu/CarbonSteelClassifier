@@ -53,8 +53,8 @@ No se usa Auth de usuarios finales. Las imágenes de predicción no se almacenan
 2. Selecciona o arrastra una imagen metalográfica.
 3. El frontend envía `multipart/form-data` a `POST /predict`.
 4. FastAPI valida extensión, MIME, tamaño y contenido.
-5. El servicio de inferencia aplica el preprocessing canónico y ejecuta el modelo activo.
-6. La API responde con clase, confianza, probabilidades e info del modelo.
+5. El servicio de inferencia aplica el preprocessing canónico, ejecuta el modelo activo y deriva la presencia de ferrita, perlita y cementita.
+6. La API responde con clase morfológica, confianza, probabilidades, fases identificadas e info del modelo.
 7. Opcionalmente se registra un análisis anónimo en PostgreSQL.
 8. La imagen en memoria se descarta.
 

@@ -10,6 +10,7 @@ from ..schemas.prediction import (
     ClassProbability,
     ModelInfo,
     ModelStatusResponse,
+    PhasePresence,
     PredictResponse,
 )
 
@@ -114,6 +115,14 @@ def predict_image_bytes(content: bytes) -> PredictResponse:
                 probability=float(item["probability"]),
             )
             for item in result.probabilities
+        ],
+        identified_phases=[
+            PhasePresence(
+                slug=str(item["slug"]),
+                name=str(item["name"]),
+                present=bool(item["present"]),
+            )
+            for item in result.identified_phases
         ],
         model=ModelInfo(
             name=result.model_name,

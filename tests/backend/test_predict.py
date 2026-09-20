@@ -78,3 +78,9 @@ def test_predict_returns_seven_class_probabilities() -> None:
     assert 0.0 <= payload["confidence"] <= 1.0
     assert len(payload["probabilities"]) == 7
     assert abs(sum(item["probability"] for item in payload["probabilities"]) - 1.0) < 1e-5
+    assert "identified_phases" in payload
+    assert {item["name"] for item in payload["identified_phases"]} == {
+        "Ferrita",
+        "Perlita",
+        "Cementita",
+    }
