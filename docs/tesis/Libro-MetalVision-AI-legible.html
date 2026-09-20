@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MetalVision AI — Trabajo de investigación UIS 2026 (versión legible)</title>
+  <style>
+    :root {
+      --uis: #006341;
+      --uis-dark: #053d2a;
+      --ink: #1a1a1a;
+      --muted: #4a4a4a;
+      --line: #c5d4cc;
+      --paper: #fbfaf6;
+    }
+    * { box-sizing: border-box; }
+    html { font-size: 12pt; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Times New Roman", Times, serif;
+      background: #e8ece9;
+    }
+    .toolbar {
+      position: sticky; top: 0; z-index: 20;
+      display: flex; gap: 12px; align-items: center; justify-content: space-between;
+      padding: 10px 18px;
+      background: var(--uis-dark); color: #fff;
+      font-family: "Segoe UI", system-ui, sans-serif; font-size: 14px;
+    }
+    .toolbar button, .toolbar a {
+      background: #fff; color: var(--uis-dark); border: 0; border-radius: 6px;
+      padding: 8px 14px; font-weight: 600; text-decoration: none; cursor: pointer;
+    }
+    .book {
+      max-width: 210mm;
+      margin: 24px auto 64px;
+      background: #fff;
+      box-shadow: 0 8px 32px rgba(0,0,0,.18);
+    }
+    .page {
+      padding: 25mm 25mm 25mm 30mm;
+      min-height: 297mm;
+    }
+    .cover, .inner-cover {
+      min-height: 297mm;
+      padding: 22mm 22mm;
+      page-break-after: always;
+    }
+    .cover {
+      background: linear-gradient(180deg, var(--uis-dark) 0%, #0b1f17 55%, var(--uis) 100%);
+      color: #fff;
+      display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .cover .uni { letter-spacing: .18em; text-transform: uppercase; font-size: 11pt; color: #b7e0cc; }
+    .cover h1 { font-size: 18pt; line-height: 1.35; font-weight: 700; margin: 28px 0; text-align: center; }
+    .cover .authors { text-align: center; font-size: 13pt; letter-spacing: .08em; }
+    .cover .foot { text-align: center; font-size: 11pt; line-height: 1.7; color: #d7efe4; }
+    .inner-cover { text-align: center; }
+    .inner-cover h1 { font-size: 15pt; line-height: 1.4; margin: 48px 0 36px; }
+    .inner-cover .authors { margin: 48px 0; letter-spacing: .12em; font-size: 12.5pt; }
+    .inner-cover .meta { margin-top: 40px; line-height: 1.8; }
+    h1.chapter { font-size: 16pt; color: var(--uis-dark); border-bottom: 2px solid var(--uis); padding-bottom: 8px; page-break-before: always; }
+    h1.chapter.first { page-break-before: auto; }
+    h2 { font-size: 13.5pt; color: var(--uis-dark); margin-top: 1.4em; }
+    h3 { font-size: 12.5pt; color: var(--uis); margin-top: 1.2em; }
+    h4 { font-size: 12pt; margin-top: 1em; }
+    p, li { line-height: 1.7; text-align: justify; hyphens: auto; }
+    p { margin: 0 0 .85em; }
+    .abstract { background: var(--paper); border-left: 4px solid var(--uis); padding: 16px 18px; margin: 18px 0 28px; }
+    .toc a { color: inherit; text-decoration: none; }
+    .toc ol { list-style: none; padding: 0; }
+    .toc li { line-height: 1.7; display: flex; justify-content: space-between; gap: 12px; }
+    .toc .dot { flex: 1; border-bottom: 1px dotted #999; margin: 0 8px 6px; }
+    .toc .sec { margin-left: 18px; font-size: 11.5pt; }
+    .toc .sub { margin-left: 36px; font-size: 11pt; color: var(--muted); }
+    table { width: 100%; border-collapse: collapse; margin: 14px 0 22px; font-size: 10.5pt; }
+    th, td { border: 1px solid #b7c7be; padding: 6px 8px; vertical-align: top; }
+    th { background: #e7f3ec; color: var(--uis-dark); text-align: left; }
+    caption { caption-side: top; font-style: italic; text-align: left; margin-bottom: 6px; color: var(--muted); }
+    figure { margin: 22px 0; page-break-inside: avoid; }
+    figcaption { font-size: 10.5pt; font-style: italic; color: var(--muted); margin-top: 8px; }
+    .fig-box { border: 1px solid var(--line); background: #f7faf8; padding: 14px; }
+    pre, code { font-family: "Courier New", monospace; font-size: 9.5pt; }
+    pre { background: #0f241c; color: #e8fff4; padding: 14px; overflow-x: auto; line-height: 1.4; }
+    .note { font-size: 10.5pt; color: var(--muted); }
+    .center { text-align: center; }
+    .small { font-size: 10.5pt; }
+    .cm td { text-align: center; font-variant-numeric: tabular-nums; }
+    .cm td.diag { background: #c8ecd6; font-weight: 700; }
+    .cm td.miss { background: #fde7e1; }
+    .kpi { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 16px 0 24px; }
+    .kpi div { border: 1px solid var(--line); padding: 12px; text-align: center; background: #f4faf7; }
+    .kpi strong { display: block; font-size: 16pt; color: var(--uis-dark); }
+    .disclaimer { border: 1px solid var(--uis); padding: 12px 14px; background: #f3faf6; }
+    .plain { background: #f4faf7; border-left: 4px solid var(--uis); padding: 12px 16px; margin: 14px 0 22px; }
+    .plain p { margin-bottom: .4em; }
+    .ref { padding-left: 2em; text-indent: -2em; margin-bottom: 0.85em; }
+    @media print {
+      .toolbar { display: none !important; }
+      body { background: #fff; }
+      .book { margin: 0; box-shadow: none; max-width: none; }
+      .page, .cover, .inner-cover { padding: 0; min-height: auto; }
+      .cover, .inner-cover, h1.chapter { break-before: page; }
+      h1.chapter.first { break-before: auto; }
+      a { text-decoration: none; color: inherit; }
+      @page { size: A4; margin: 25mm 20mm 25mm 30mm; }
+      p, li { line-height: 1.75; }
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <span>Libro de trabajo de grado · MetalVision AI · UIS 2026 (versión legible)</span>
+    <span>
+      <button type="button" onclick="window.print()">Imprimir / guardar PDF (A4)</button>
+    </span>
+  </div>
+  <article class="book">
+
+<section class="cover">
+  <div>
+    <p class="uni center">Universidad Industrial de Santander</p>
+    <p class="center" style="margin-top:8px;color:#b7e0cc;">Facultad de Ingenierías Físico-Químicas</p>
+    <p class="center" style="color:#b7e0cc;">Escuela de Ingeniería Metalúrgica y Ciencia de Materiales</p>
+  </div>
+  <div>
+    <p class="center" style="letter-spacing:.28em;font-size:11pt;color:#9ad4b8;">TRABAJO DE INVESTIGACIÓN</p>
+    <h1>DESARROLLO DE UNA HERRAMIENTA DIDÁCTICA BASADA EN UNA RED NEURONAL CONVOLUCIONAL (CNN) PARA LA IDENTIFICACIÓN DE FASES Y CONSTITUYENTES MICROESTRUCTURALES EN ACEROS AL CARBONO</h1>
+    <p class="authors">MARIA VALENTINA FAJARDO ROJAS<br />JUAN PABLO FAJARDO SANABRIA</p>
+  </div>
+  <div class="foot">
+    <p>BUCARAMANGA<br />2026</p>
+  </div>
+</section>
+
+<section class="inner-cover">
+  <p class="small">UNIVERSIDAD INDUSTRIAL DE SANTANDER</p>
+  <p class="small">FACULTAD DE INGENIERÍAS FÍSICO-QUÍMICAS</p>
+  <p class="small">ESCUELA DE INGENIERÍA METALÚRGICA Y CIENCIA DE MATERIALES</p>
+  <h1>DESARROLLO DE UNA HERRAMIENTA DIDÁCTICA BASADA EN UNA RED NEURONAL CONVOLUCIONAL (CNN) PARA LA IDENTIFICACIÓN DE FASES Y CONSTITUYENTES MICROESTRUCTURALES EN ACEROS AL CARBONO</h1>
+  <p class="authors">MARIA VALENTINA FAJARDO ROJAS<br /><br />JUAN PABLO FAJARDO SANABRIA</p>
+  <p><strong>TRABAJO DE INVESTIGACIÓN, PRESENTADO COMO REQUISITO DE GRADO PARA OPTAR AL TÍTULO DE INGENIERO METALÚRGICO</strong></p>
+  <div class="meta">
+    <p><strong>DIRECTOR</strong><br />CARLOS EDUARDO RONDON ALMEYDA</p>
+    <p><strong>CO-DIRECTOR</strong><br />ANA EMILSE COY ECHEVERRIA</p>
+    <p style="margin-top:48px;">BUCARAMANGA<br />2026</p>
+  </div>
+</section>
+
+<section class="page">
+  <h1 class="chapter first">RESUMEN</h1>
+  <div class="abstract">
+  <p>Este trabajo presenta MetalVision AI, una página web académica de acceso público que ayuda a identificar, en fotografías de microscopio, siete microestructuras de aceros al carbono. La herramienta no sustituye al laboratorio ni al profesor: ofrece una segunda lectura inmediata, con un porcentaje de confianza y un texto científico breve, para que el estudiante compare lo que ve con lo que propone el modelo.</p>
+  <p>El desarrollo tuvo dos etapas. Primero se entrenó un prototipo en un cuaderno en la nube de Google (Google Colab), con PyTorch y una red liviana llamada MobileNetV2: alcanzó 96,9 % de aciertos en 359 imágenes de prueba; quedó archivado y no es el que usa la página web. Después se construyó el modelo actual con Keras —una librería de Python, encima de TensorFlow, con la que se arma y entrena la red de forma práctica—. Ese modelo (MicrostructureCNN) alcanzó 90,0 % de aciertos y 90,0 % en un indicador de equilibrio por clase (F1 macro: equilibra no inventar una clase y no olvidarla cuando sí está) sobre 239 imágenes de prueba independientes. Un segundo entrenamiento más agresivo bajó el resultado a ~70,7 % y no se adoptó. Encima se implementó la interfaz sin registro de usuarios. Se concluye que la herramienta cumple los tres objetivos específicos y que varios errores del modelo coinciden con confusiones típicas de quien está aprendiendo a leer micrografías.</p>
+  <p><strong>Palabras clave:</strong> aceros al carbono, metalografía, redes neuronales convolucionales, aprendizaje por transferencia, herramienta didáctica, MetalVision AI.</p>
+  </div>
+
+  <h1 class="chapter">ABSTRACT</h1>
+  <div class="abstract">
+  <p>This research presents MetalVision AI, a public educational website that helps students identify seven carbon-steel microstructures in microscope images. The tool does not replace the laboratory or the instructor: it offers a second, immediate reading with a confidence score and a short scientific note so that the learner can compare what they see with what the model proposes.</p>
+  <p>Development involved two model stages. A first prototype was trained in Google Colab (PyTorch, MobileNetV2) and reached 96.9 % test accuracy on 359 images; it was archived and is not used by the web application. The current application model is TensorFlow/Keras MicrostructureCNN (checkpoint <code>best_head</code>), with 90.0 % test accuracy and 90.0 % macro-F1 on 239 held-out images (train/validation/test split = 1699/466/239). Fine-tuning the last layers dropped accuracy to about 70.7 % and was not deployed. The interface requires no user accounts and shows class probabilities plus a short scientific note. Model mistakes often match the same ambiguities a beginner metallographer faces.</p>
+  <p><strong>Keywords:</strong> carbon steels, metallography, convolutional neural networks, transfer learning, educational tool, MetalVision AI.</p>
+  </div>
+</section>
+
+<section class="page">
+  <h1 class="chapter">AGRADECIMIENTOS</h1>
+  <p>Los autores expresan su agradecimiento a la Universidad Industrial de Santander, a la Facultad de Ingenierías Físico-Químicas y a la Escuela de Ingeniería Metalúrgica y Ciencia de Materiales, espacio en el que este trabajo adquiere sentido formativo.</p>
+  <p>Al ingeniero Carlos Eduardo Rondon Almeyda, director del trabajo, y a la ingeniera Ana Emilse Coy Echeverria, co-directora, por la orientación metalúrgica y metodológica.</p>
+  <p>A quienes colaboraron con micrografías, revisión de etiquetas o pruebas de la interfaz: su criterio experto es el suelo que pisa cualquier red de este dominio. Los errores que restan son de los autores.</p>
+</section>
+
+<section class="page">
+  <h1 class="chapter">TABLA DE CONTENIDO</h1>
+  <nav class="toc">
+    <ol>
+      <li><span>INTRODUCCIÓN</span><span class="dot"></span></li>
+      <li><span>1. GENERALIDADES DEL PROYECTO</span><span class="dot"></span></li>
+      <li class="sec"><span>1.1 Descripción del problema</span></li>
+      <li class="sec"><span>1.2 Justificación</span></li>
+      <li class="sec"><span>1.3 Objetivos</span></li>
+      <li class="sub"><span>1.3.1 Objetivo general</span></li>
+      <li class="sub"><span>1.3.2 Objetivos específicos</span></li>
+      <li class="sec"><span>1.4 Alcance</span></li>
+      <li><span>2. FUNDAMENTOS TEÓRICOS</span><span class="dot"></span></li>
+      <li class="sec"><span>2.1 Aceros al carbono</span></li>
+      <li class="sec"><span>2.2 Diagrama de equilibrio hierro-carbono</span></li>
+      <li class="sec"><span>2.3 Transformaciones de fase en los aceros al carbono</span></li>
+      <li class="sec"><span>2.4 Metalografía de los aceros al carbono</span></li>
+      <li class="sec"><span>2.5 Fases y microconstituyentes de los aceros al carbono</span></li>
+      <li class="sub"><span>2.5.1 Ferrita</span></li>
+      <li class="sub"><span>2.5.2 Perlita</span></li>
+      <li class="sub"><span>2.5.3 Austenita</span></li>
+      <li class="sub"><span>2.5.4 Martensita</span></li>
+      <li class="sub"><span>2.5.5 Cementita y perlita</span></li>
+      <li class="sub"><span>2.5.6 Ferrita Widmanstätten y perlita</span></li>
+      <li class="sub"><span>2.5.7 Ferrita equiaxial y perlita</span></li>
+      <li class="sec"><span>2.6 Identificación de microestructuras mediante micrografías</span></li>
+      <li class="sec"><span>2.7 Inteligencia artificial</span></li>
+      <li class="sec"><span>2.8 Aprendizaje automático y aprendizaje profundo</span></li>
+      <li class="sec"><span>2.9 Redes neuronales convolucionales</span></li>
+      <li class="sec"><span>2.10 Aprendizaje por transferencia</span></li>
+      <li class="sec"><span>2.11 Procesamiento y aumento de imágenes</span></li>
+      <li class="sec"><span>2.12 Métricas de evaluación para modelos de clasificación</span></li>
+      <li><span>3. METODOLOGÍA EXPERIMENTAL</span><span class="dot"></span></li>
+      <li class="sec"><span>3.1 Revisión bibliográfica</span></li>
+      <li class="sec"><span>3.2 Definición de las microestructuras a identificar</span></li>
+      <li class="sec"><span>3.3 Obtención y organización del conjunto de datos</span></li>
+      <li class="sec"><span>3.4 Preprocesamiento de las imágenes</span></li>
+      <li class="sec"><span>3.5 Selección y configuración del modelo</span></li>
+      <li class="sec"><span>3.6 Entrenamiento de la red neuronal</span></li>
+      <li class="sec"><span>3.7 Validación y evaluación del modelo</span></li>
+      <li class="sec"><span>3.8 Desarrollo de la aplicación MetalVision AI</span></li>
+      <li class="sec"><span>3.9 Pruebas funcionales de la aplicación</span></li>
+      <li><span>4. RESULTADOS Y ANÁLISIS</span><span class="dot"></span></li>
+      <li class="sec"><span>4.7 Funcionamiento de MetalVision AI como producto</span></li>
+      <li class="sub"><span>4.7.1 Nivel Básica</span></li>
+      <li class="sub"><span>4.7.2 Nivel Principiante</span></li>
+      <li class="sub"><span>4.7.3 Nivel Experto</span></li>
+      <li class="sub"><span>4.7.4 Criterios de evaluación del producto didáctico</span></li>
+      <li><span>5. CONCLUSIONES</span><span class="dot"></span></li>
+      <li><span>6. RECOMENDACIONES</span><span class="dot"></span></li>
+      <li><span>BIBLIOGRAFÍA</span><span class="dot"></span></li>
+      <li><span>ANEXOS</span><span class="dot"></span></li>
+    </ol>
+  </nav>
+
+  <h2>Lista de tablas</h2>
+  <p class="small">Tabla 1. Clases oficiales de MetalVision AI y su orden de entrenamiento.<br />
+  Tabla 2. Hiperparámetros del modelo MicrostructureCNN (Keras).<br />
+  Tabla 3. Distribución del conjunto de prueba del modelo actual (n = 239).<br />
+  Tabla 4. Métricas por microestructura en el conjunto de prueba (Keras, best_head).<br />
+  Tabla 5. Matriz de confusión del modelo seleccionado (best_head, n = 239).<br />
+  Tabla 6. Comparación del prototipo (Google Colab / PyTorch) y del modelo actual (Keras).<br />
+  Tabla 7. Comparación de checkpoints Keras (cabeza vs. ajuste fino).</p>
+
+  <h2>Lista de figuras</h2>
+  <p class="small">Figura 1. Esquema conceptual de una red neuronal convolucional.<br />
+  Figura 2. Diagrama simplificado Fe–C en el rango de los aceros.<br />
+  Figura 3. Arquitectura de MetalVision AI.<br />
+  Figura 4. Arquitectura de MicrostructureCNN (MobileNetV2 + cabeza de clasificación).<br />
+  Figura 5. Flujo de una predicción en la aplicación.</p>
+</section>
+
+<section class="page">
+  <h1 class="chapter">INTRODUCCIÓN</h1>
+  <p>La microestructura de un acero al carbono es el registro visible de su composición química y de su historia térmica. Quien aprende a leerla puede inferir, con fundamento, si un material fue recocido, normalizado o templado, si el enfriamiento fue lento o excesivamente rápido, y si las propiedades esperadas —dureza, ductilidad, tenacidad— son coherentes con lo que se observa al microscopio. Por eso, en la formación del ingeniero metalúrgico, la identificación de fases y microconstituyentes no es un ejercicio ornamental: es una competencia profesional (Callister y Rethwisch, 2020).</p>
+  <p>Esa competencia, sin embargo, se construye con lentitud. La evaluación manual de una micrografía puede demandar alrededor de quince minutos cuando la realiza un experto y, aun así, introduce variabilidad entre observadores (Almeida et al., 2025). En las etapas iniciales de la carrera, los estudiantes suelen confundir morfologías próximas —láminas de perlita con redes de cementita, ferrita equiaxial con ferrita de Widmanstätten, martensita con austenita retenida— y el tiempo de aula no siempre alcanza para reiterar el contraste entre casos. El laboratorio metalográfico sigue siendo irreemplazable; lo que falta, con frecuencia, es un medio de práctica inmediata, repetible y sin temor a “equivocarse delante del profesor” (Müller et al., 2024).</p>
+  <p>La inteligencia artificial se ha consolidado como herramienta transversal en los ámbitos científico, industrial y educativo (Russell y Norvig, 2021; SEAS, 2024). En el ámbito académico fortalece el aprendizaje activo mediante retroalimentación inmediata y análisis automatizado, en coherencia con el modelo pedagógico de la Universidad Industrial de Santander, orientado al aprendizaje significativo con enfoque reconstructivista y progresivista (Universidad Industrial de Santander, s. f.). En visión por computador, las redes neuronales convolucionales —programas que aprenden a reconocer patrones en imágenes mirando muchos ejemplos— permiten extraer de una foto bordes, texturas y formas sin que un experto diseñe a mano cada descriptor (LeCun et al., 2015; Goodfellow et al., 2016). En aceros, esa capacidad ya se ha demostrado en clasificación y segmentación de microestructuras, con precisiones reportadas por encima del 90 % en varios estudios de referencia (Azimi et al., 2018; Durmaz et al., 2023). Lo que todavía es escaso es su uso deliberado como instrumento didáctico en la formación universitaria de ingenieros metalúrgicos (Nieves et al., 2025; Kumar et al., 2021).</p>
+  <p>Este trabajo responde a esa brecha. Se desarrolló MetalVision AI (repositorio técnico CarbonSteelClassifier), una página de acceso público que clasifica micrografías de aceros al carbono en siete nombres oficiales: austenita, ferrita, perlita, cementita + perlita, perlita + ferrita Widmanstätten, perlita + ferrita equiaxial y martensita. El orden de esas clases es el de entrenamiento e inferencia y vive en un archivo canónico compartido por todo el sistema.</p>
+  <p>Hubo dos versiones del modelo, y conviene distinguirlas desde el principio. El <strong>prototipo</strong> se entrenó en un cuaderno en la nube de Google con GPU, usado solo para el prototipo (Google Colab), con PyTorch: sirvió para probar la red, el conjunto de imágenes y las métricas, y alcanzó 96,9 % de exactitud en 359 fotos de prueba. El <strong>modelo actual</strong>, el que usa la aplicación, se reentrenó con una librería de Python, encima de TensorFlow, con la que se arma y entrena la red de forma práctica (Keras), para poder cargarlo de forma estable en el servidor web, con el orden oficial de las siete clases. Ese modelo (MicrostructureCNN, checkpoint <code>best_head</code>) alcanzó 90,0 % de exactitud y 90,0 % de F1 macro en 239 imágenes de prueba. Encima se construyó la interfaz: el estudiante carga una foto, ve la clase, la confianza, las otras opciones y un texto científico, y lo compara con su propio criterio.</p>
+  <p>El documento se organiza como sigue. El capítulo 1 presenta el problema, la justificación, los objetivos y el alcance. El capítulo 2 reúne los fundamentos metalúrgicos y de aprendizaje profundo necesarios para interpretar tanto las imágenes como el modelo. El capítulo 3 describe la metodología experimental, desde la organización del conjunto de datos hasta las pruebas funcionales de la aplicación. El capítulo 4 reporta resultados cuantitativos y un análisis metalúrgico de aciertos y confusiones. Los capítulos 5 y 6 cierran con conclusiones y recomendaciones. Los anexos recogen, en lenguaje llano, la arquitectura, un extracto breve del modelo y el manual de usuario.</p>
+  <p>Este documento está escrito para un lector de Ingeniería Metalúrgica —y, en general, para cualquier lector universitario cuidadoso—. Cuando aparece un término de informática, se explica primero en lenguaje cotidiano y después se da el nombre técnico. Las cifras de desempeño no se inventan: salen de los reportes guardados con cada modelo (<code>ml/models/trained/metrics.json</code> para el modelo actual).</p>
+  <div class="disclaimer">
+    <p><strong>Nota de uso académico.</strong> MetalVision AI no reemplaza el criterio de un especialista metalúrgico ni constituye un diagnóstico industrial. Su propósito es didáctico, investigativo y de apoyo al aprendizaje.</p>
+  </div>
+</section>
+
+<section class="page">
+  <h1 class="chapter">1. GENERALIDADES DEL PROYECTO</h1>
+
+  <h2>1.1 Descripción del problema</h2>
+  <p>En la actualidad, la inteligencia artificial se ha consolidado como una herramienta transversal en los ámbitos científico, industrial y educativo de manera progresiva. En el ámbito académico, fortalece el aprendizaje activo y significativo mediante retroalimentación inmediata y análisis automatizado, convirtiéndose en un apoyo estratégico para el modelo pedagógico de la Universidad Industrial de Santander, orientado al aprendizaje significativo con enfoque reconstructivista y progresivista.</p>
+  <p>En la formación de ingenieros metalúrgicos la identificación de fases microestructurales es una competencia fundamental. No obstante, para muchos estudiantes este análisis representa una dificultad, especialmente en las etapas iniciales de su formación, generando errores frecuentes y un prolongado tiempo de aprendizaje.</p>
+  <p>En este contexto, las redes neuronales convolucionales (CNN) representan una base tecnológica sólida para el análisis de imágenes. Estas permiten identificar y extraer características relevantes de las micrografías, facilitando su clasificación de manera objetiva, consistente y reproducible. Aunque su implementación es amplia en sectores industriales y científicos, su uso como herramienta didáctica en la formación universitaria aún es limitada.</p>
+  <p>Ante esta situación, se busca implementar en la Escuela de Ingeniería Metalúrgica y Ciencia de los Materiales de la UIS una herramienta didáctica basada en inteligencia artificial que permita el análisis de imágenes metalográficas mediante CNN, con la finalidad de mejorar la precisión en la identificación de fases microestructurales, reducir el tiempo de aprendizaje y fortalecer el aprendizaje significativo y activo de los estudiantes, en coherencia con el modelo pedagógico institucional.</p>
+
+  <h2>1.2 Justificación</h2>
+  <p>Tres razones hacen pertinente este trabajo en la Escuela de Ingeniería Metalúrgica y Ciencia de Materiales.</p>
+  <p>Primero, una razón <em>formativa</em>. Identificar ferrita, perlita, martensita o una morfología de Widmanstätten exige articular el diagrama Fe–C, las transformaciones de fase y la práctica del microscopio (Callister y Rethwisch, 2020). Una herramienta que devuelve, en segundos, una hipótesis de clase junto con una ficha científica obliga al estudiante a comparar lo que ve con lo que el modelo “ve”, y a argumentar el acuerdo o el desacuerdo. Esa comparación es aprendizaje significativo: no sustituye el laboratorio; lo prepara y lo refuerza (Universidad Industrial de Santander, s. f.).</p>
+  <p>Segundo, una razón <em>técnica y de objetividad</em>. El análisis microestructural convencional es lento y subjetivo (Müller et al., 2024; Almeida et al., 2025). Las redes neuronales convolucionales han mostrado que es posible extraer patrones de textura con consistencia estadística (Nieves et al., 2025; Azimi et al., 2018). Llevar esa consistencia al aula no pretende automatizar el juicio profesional; pretende mostrar un referente reproducible contra el cual el estudiante calibra el suyo.</p>
+  <p>Tercero, una razón <em>institucional y de acceso</em>. MetalVision AI se diseñó como plataforma pública, sin cuentas de usuario ni almacenamiento permanente de las imágenes cargadas. El estudiante entra, analiza y se va. Esa decisión alinea el producto con un uso en sala de cómputo, en casa o en práctica, y con una política de privacidad mínima: las predicciones opcionales que se registran en base de datos son anónimas.</p>
+  <p>El proyecto se justifica, en síntesis, porque conecta un problema real de aprendizaje —la lectura de micrografías— con una tecnología ya madura en la literatura, y porque lo hace en forma de herramienta usable, evaluable y coherente con el modelo pedagógico de la UIS (Kumar et al., 2021; SEAS, 2024).</p>
+
+  <h2>1.3 Objetivos</h2>
+  <h3>1.3.1 Objetivo general</h3>
+  <p>Desarrollar una herramienta didáctica basada en una red neuronal convolucional para la identificación de fases y constituyentes microestructurales en aceros al carbono.</p>
+  <h3>1.3.2 Objetivos específicos</h3>
+  <ol>
+    <li>Construir una red neuronal convolucional en Python para identificar fases y constituyentes microestructurales en aceros al carbono.</li>
+    <li>Evaluar el desempeño del modelo mediante métricas cuantitativas de clasificación, determinando la precisión de la red neuronal convolucional.</li>
+    <li>Implementar una interfaz operativa de la red neuronal convolucional como herramienta didáctica de formación.</li>
+  </ol>
+
+  <h2>1.4 Alcance</h2>
+  <p>El trabajo cubre el ciclo completo de una herramienta didáctica de clasificación de imágenes, con los siguientes límites explícitos.</p>
+  <p><strong>Incluye.</strong> (a) Un prototipo de red neuronal convolucional entrenado en Google Colab (PyTorch) para validar la idea. (b) Un modelo actual en TensorFlow/Keras de siete clases, con orden fijo: austenita, ferrita, perlita, cementita + perlita, perlita + ferrita Widmanstätten, perlita + ferrita equiaxial y martensita. (c) El mismo preprocesado de la foto en el entrenamiento y en la página web (corrección EXIF, color RGB, 224×224 píxeles con interpolación Lanczos y la normalización de MobileNetV2). (d) Evaluación con exactitud, precisión, exhaustividad (recall), F1 y matriz de confusión. (e) Una aplicación web —MetalVision AI— con servidor FastAPI y frontend React/Vite, para cargar una o varias micrografías, ver la predicción y leer una ficha científica. Las imágenes que sube el usuario no se guardan de forma permanente. (f) Un reporte derivado de presencia/ausencia de ferrita, perlita y cementita a partir de la etiqueta de las siete clases.</p>
+  <p><strong>No incluye.</strong> Contar el porcentaje de cada fase en la foto (eso sería segmentación). Aceros aleados, fundiciones o microestructuras fuera de las siete etiquetas. Diagnóstico industrial ni reemplazo del metalógrafo. Cuentas de usuario ni historial personal. El prototipo de Colab no es el que corre en la página: la aplicación usa solo el modelo Keras actual (checkpoint <code>best_head</code>).</p>
+  <p>El producto se nombra de dos maneras: <em>CarbonSteelClassifier</em> es el proyecto técnico; <em>MetalVision AI</em> es el nombre que ve el estudiante.</p>
+  <p><strong>Limitaciones de alcance.</strong> El conjunto de imágenes completo no se publica en Git, por política de no versionar datos pesados. En este trabajo se caracterizan con números el conjunto de prueba del modelo actual (n = 239) y las particiones de entrenamiento y validación (1699 y 466), tomadas del reporte de entrenamiento. Tampoco se reporta un ensayo controlado con estudiantes: el objeto de evaluación del objetivo 2 es el modelo, no la nota del curso. Quien cite este trabajo como evidencia de “mejora del aprendizaje” deberá completar esa evaluación o abstenerse. Finalmente, el 90,0 % corresponde a un split con semilla 42 y estrategia por grupo de origen; un split distinto puede mover los decimales. Lo que no debería moverse sin reentrenar es el orden de las siete clases.</p>
+</section>
+
+<section class="page">
+  <h1 class="chapter">2. FUNDAMENTOS TEÓRICOS</h1>
+  <p>En la ingeniería metalúrgica, la caracterización microestructural de los aceros es importante para comprender el comportamiento de los materiales, ya que la microestructura está relacionada con sus propiedades mecánicas, térmicas y químicas. En los aceros al carbono, las fases y constituyentes influyen en propiedades como la resistencia, la ductilidad y la tenacidad. Por esta razón, el análisis microestructural mediante técnicas metalográficas ha sido ampliamente utilizado en la industria y en la investigación para establecer la relación entre el procesamiento, la microestructura y las propiedades finales del material (Müller et al., 2024). Sin embargo, el proceso de análisis microestructural suele ser lento y subjetivo: la evaluación manual de micrografías puede tardar aproximadamente 15 minutos por imagen cuando es realizada por un experto, generando variabilidad en la interpretación (Almeida et al., 2025). Debido a estas limitaciones, en los últimos años se han explorado alternativas para automatizar el análisis microestructural y reducir la dependencia de la evaluación manual (Abdelal et al., 2026). En este contexto, la inteligencia artificial, particularmente las redes neuronales convolucionales, ha surgido como herramienta para el análisis automático de imágenes, ya que permite identificar patrones y características de manera objetiva y reproducible (Nieves et al., 2025; Azimi et al., 2018).</p>
+
+  <h2>2.1 Aceros al carbono</h2>
+  <p>Se denomina acero al carbono a la aleación Fe–C —con impurezas habituales de Mn, Si, P y S en bajos tenores— cuyo contenido de carbono es, en la práctica de los aceros, inferior al límite de solubilidad de la austenita en el diagrama metaestable Fe–Fe<sub>3</sub>C, próximo a 2,11 % C. Por debajo de ese valor el material puede austenizarse por completo; por encima se entra en el dominio de las fundiciones. El carbono es el aleante que más desplaza las propiedades: aumenta la resistencia y la templabilidad a costa de la ductilidad y de la soldabilidad (Callister y Rethwisch, 2020).</p>
+  <p>Una clasificación útil para leer micrografías es la posición respecto al eutectoide (~0,76–0,77 % C):</p>
+  <ul>
+    <li><strong>Hipoeutectoides</strong> (&lt; 0,77 % C): al enfriarse lentamente precipitan ferrita proeutectoide y, a 727 °C, el austenita restante se transforma en perlita. La fracción de ferrita crece al disminuir el carbono.</li>
+    <li><strong>Eutectoides</strong> (~0,77 % C): la austenita se transforma casi por completo en perlita.</li>
+    <li><strong>Hipereutectoides</strong> (0,77–2,11 % C): precipita cementita proeutectoide, con frecuencia en bordes de grano, y el resto forma perlita.</li>
+  </ul>
+  <p>El tratamiento térmico —recocido, normalizado, temple, revenido— no cambia esa química, pero sí la trayectoria en los diagramas tiempo–temperatura–transformación y de enfriamiento continuo, y con ella la morfología que el microscopio revela (Callister y Rethwisch, 2020). MetalVision AI no estima el % C ni el ciclo térmico: clasifica la <em>apariencia</em> resultante en una de siete etiquetas pedagógicas.</p>
+  <p>Conviene subrayar una distinción de vocabulario que el proyecto respeta en el software. <em>Fase</em> designa una porción homogénea de materia con estructura cristalina propia (ferrita, austenita, cementita, martensita). <em>Microconstituyente</em> designa una asociación reconocible al microscopio que puede estar formada por más de una fase (perlita). <em>Morfología</em> designa la geometría (equiaxial, acicular, laminar, en red). Las siete etiquetas de MetalVision AI combinan los tres niveles porque así se enseña a ver, no porque el modelo distinga redes de Bravais (Bargmann et al., 2018).</p>
+
+  <h2>2.2 Diagrama de equilibrio hierro-carbono</h2>
+  <p>El diagrama metaestable Fe–Fe<sub>3</sub>C es el mapa de fases en equilibrio en función de la temperatura y del carbono. Para los aceros interesan, sobre todo, el campo de la austenita (γ, estructura cúbica centrada en las caras), el de la ferrita (α, cúbica centrada en el cuerpo), la cementita (Fe<sub>3</sub>C, ~6,67 % C) y las reacciones invariantes (Callister y Rethwisch, 2020).</p>
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 640 340" width="100%" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Diagrama simplificado Fe-C">
+        <rect width="640" height="340" fill="#f7faf8"/>
+        <text x="320" y="22" text-anchor="middle" font-size="13" fill="#053d2a">Figura 2. Esquema simplificado del diagrama Fe–Fe₃C (aceros)</text>
+        <line x1="70" y1="50" x2="70" y2="290" stroke="#053d2a" stroke-width="2"/>
+        <line x1="70" y1="290" x2="600" y2="290" stroke="#053d2a" stroke-width="2"/>
+        <text x="28" y="170" transform="rotate(-90 28 170)" font-size="11">T (°C)</text>
+        <text x="330" y="325" text-anchor="middle" font-size="11">% C</text>
+        <text x="62" y="78" text-anchor="end" font-size="10">1538</text>
+        <text x="62" y="118" text-anchor="end" font-size="10">1148</text>
+        <text x="62" y="168" text-anchor="end" font-size="10">912</text>
+        <text x="62" y="208" text-anchor="end" font-size="10">727</text>
+        <line x1="70" y1="200" x2="560" y2="200" stroke="#006341" stroke-dasharray="6 4"/>
+        <text x="575" y="204" font-size="10" fill="#006341">A₁ 727 °C</text>
+        <path d="M90 70 L250 110 L430 110 L560 200" fill="none" stroke="#2a6" stroke-width="2"/>
+        <path d="M90 70 L180 200 L430 200" fill="none" stroke="#084" stroke-width="1.5"/>
+        <circle cx="180" cy="200" r="4" fill="#c0392b"/>
+        <text x="188" y="196" font-size="10">eutectoide ~0,77 % C</text>
+        <text x="100" y="250" font-size="11">α + Fe₃C</text>
+        <text x="300" y="160" font-size="11">γ (austenita)</text>
+        <text x="95" y="145" font-size="11">α</text>
+        <text x="70" y="308" font-size="9">0</text>
+        <text x="175" y="308" font-size="9">0,77</text>
+        <text x="430" y="308" font-size="9">2,11</text>
+        <text x="545" y="308" font-size="9">6,67</text>
+      </svg>
+    </div>
+    <figcaption>Figura 2. Representación didáctica —no a escala de ingeniería de detalle— de los campos relevantes para aceros al carbono. La línea A₁ (~727 °C) marca la transformación eutectoide austenita → perlita en enfriamiento lento.</figcaption>
+  </figure>
+  <p>Puntos de apoyo para este trabajo: solubilidad máxima de C en ferrita ≈ 0,02 % a 727 °C; eutectoide ≈ 0,77 % C a 727 °C; solubilidad máxima de C en austenita ≈ 2,11 % a 1148 °C. El diagrama describe <em>equilibrio</em>. La martensita no aparece en él: es un producto de no equilibrio. Esa distinción es central para no pedir al modelo que “lea el diagrama”; el modelo lee texturas que el tratamiento térmico dejó en la muestra (Callister y Rethwisch, 2020).</p>
+
+  <h2>2.3 Transformaciones de fase en los aceros al carbono</h2>
+  <p>Al enfriar austenita pueden ocurrir, según la velocidad y la composición (Callister y Rethwisch, 2020):</p>
+  <ul>
+    <li><strong>Transformación difusional eutectoide:</strong> austenita → perlita (ferrita + cementita laminares). Es la ruta del enfriamiento lento.</li>
+    <li><strong>Precipitación proeutectoide:</strong> ferrita en aceros hipoeutectoides o cementita en hipereutectoides, antes de completar la perlita.</li>
+    <li><strong>Morfología de Widmanstätten:</strong> placas o agujas de ferrita que crecen sobre planos cristalográficos de la austenita cuando el grano es grueso o el enfriamiento es intermedio.</li>
+    <li><strong>Transformación martensítica:</strong> cortante, sin difusión de carbono, al templar. Produce una solución sobresaturada tetragonal, dura y frágil.</li>
+  </ul>
+  <p>La bainita no forma parte del catálogo de siete clases de este proyecto. Omitirla es una decisión de alcance pedagógico, no una afirmación de que no exista en aceros al carbono (Durmaz et al., 2023).</p>
+  <p>Los diagramas TTT y CCT precisan lo que el Fe–C de equilibrio no puede decir: <em>cuándo</em> ocurre cada producto. Un enfriamiento que atraviesa la nariz perlítica produce colonias laminares; uno que la evita y cruza M<sub>s</sub> produce martensita; uno intermedio puede generar placas de ferrita de Widmanstätten. Ese hecho metalúrgico anticipa varias confusiones del modelo: campos relativamente uniformes etiquetados como austenita cuando la verdad es martensita poco revelada, o a la inversa (Müller et al., 2024).</p>
+
+  <h2>2.4 Metalografía de los aceros al carbono</h2>
+  <p>La metalografía óptica convierte un volumen opaco en una imagen interpretable. El flujo clásico —corte, montaje, desbaste, pulido y ataque— no es cosmética: el ataque (habitualmente nital) revela bordes de grano y constituyentes porque cada fase se disuelve a distinta velocidad (Callister y Rethwisch, 2020). Una muestra mal pulida o sobreatacada introduce artefactos que una red neuronal puede tomar por textura “real”.</p>
+  <p>Las micrografías de entrenamiento e inferencia se asumen, en este trabajo, como imágenes ya preparadas (JPG, PNG, WEBP o TIFF), no como el proceso de laboratorio en sí. La herramienta clasifica lo que el microscopio ya fotografió.</p>
+  <p>El aumento óptico también condiciona la tarea. A 50× una perlita fina puede parecer un constituyente gris uniforme; a 500× se resuelven las láminas. La red usada en este proyecto recibe siempre 224×224 píxeles: una foto de alto aumento recortada a una colonia y una foto de bajo aumento de un campo mixto se vuelven tensores del mismo tamaño. El modelo no “sabe” el aumento. Esa homogeneización es útil para un prototipo didáctico y es, a la vez, un sesgo: el estudiante sí debería leer el pie de foto y la escala (Tsutsui et al., 2022).</p>
+
+  <h2>2.5 Fases y microconstituyentes de los aceros al carbono</h2>
+  <p>El catálogo de MetalVision AI mezcla <em>fases</em> (austenita, ferrita, martensita, cementita) y <em>microconstituyentes o asociaciones morfológicas</em> (perlita; cementita + perlita; perlita + ferrita Widmanstätten; perlita + ferrita equiaxial). Esa mezcla es deliberada: es la forma en que el estudiante nombra lo que ve en el ocular. Las descripciones siguientes coinciden con la fuente canónica del sistema (<code>shared/microstructure_classes.json</code>) y con la metalurgia física de referencia (Callister y Rethwisch, 2020).</p>
+
+  <h3>2.5.1 Ferrita</h3>
+  <p>Solución sólida de carbono en hierro α, estructura cúbica centrada en el cuerpo. Es la fase más estable a temperatura ambiente en aceros de bajo carbono. Muy blanda, dúctil y magnética, con baja resistencia. En micrografía suele aparecer clara, en granos poligonales, tras ataque con nital (Callister y Rethwisch, 2020).</p>
+  <p>Criterios de identificación óptica: granos claros de contorno más o menos equiaxial; ausencia de estriado laminar interno; contraste suave respecto a colonias perlíticas más oscuras cuando ambas coexisten. El error clásico de principiantes es llamar ferrita a todo lo claro. En este trabajo, el modelo actual rara vez inventa ferrita cuando no corresponde (precisión 1,0 en el conjunto de prueba de 239 imágenes).</p>
+
+  <h3>2.5.2 Perlita</h3>
+  <p>No es una fase, sino un constituyente bifásico de láminas alternas de ferrita y cementita, formado por enfriamiento lento de la austenita a partir de 727 °C. Ofrece un equilibrio clásico entre dureza, resistencia y ductilidad. Ópticamente, las colonias laminares se ven grises o iridiscentes según el espaciado y el aumento (Callister y Rethwisch, 2020).</p>
+  <p>El espaciado interlaminar depende del subenfriamiento: perlita gruesa en recocido lento, perlita fina en normalizado. A bajo aumento, la perlita fina se “cierra” en un gris perla. Esa pérdida de láminas en la digitalización a 224×224 explica, en parte, fugas hacia martensita u otras estructuras oscuras (Azimi et al., 2018).</p>
+
+  <h3>2.5.3 Austenita</h3>
+  <p>Solución sólida de carbono en hierro γ, estructura cúbica centrada en las caras. En aceros al carbono no aleados es estable solo a alta temperatura. Es blanda, dúctil, tenaz y no magnética; es la fase de partida de casi todos los tratamientos térmicos. A temperatura ambiente puede retenerse en aleaciones o en ciclos particulares; en el dataset didáctico se trata como una clase visual propia (Callister y Rethwisch, 2020).</p>
+  <p>En micrografía, la austenita retenida suele ser clara y sin el estriado de la perlita. Incluir austenita como clase didáctica obliga a aceptar un riesgo: el modelo puede aprender “campo claro poco texturizado”, patrón que ferrita y martensita mal atacada también exhiben (Müller et al., 2024).</p>
+
+  <h3>2.5.4 Martensita</h3>
+  <p>Producto monofásico del enfriamiento muy rápido (temple) de la austenita, que impide la difusión del carbono. Estructura tetragonal centrada en el cuerpo, distorsionada. Es la más dura y frágil de las estructuras de este catálogo, con ductilidad nula antes del revenido. En micrografía suele verse acicular o en listones, con contraste oscuro tras el ataque (Callister y Rethwisch, 2020).</p>
+  <p>Durmaz et al. (2023) mostraron que incluso expertos discrepan al graduar agujas de martensita/bainita; pedir a una red didáctica que resuelva lo que un round-robin industrial no unifica sería deshonesto. El F1 de martensita en el modelo actual (0,812) es, en ese sentido, un techo provisional y un tema de clase: “¿qué le faltó ver al modelo?”.</p>
+
+  <h3>2.5.5 Cementita y perlita</h3>
+  <p>Microestructura típica de aceros hipereutectoides (&gt; 0,77 % C) enfriados lentamente: el exceso de carbono forma una red o matriz de cementita proeutectoide en bordes de la antigua austenita; el resto se transforma en perlita. El conjunto es duro y quebradizo. Visualmente, la red blanca o brillante de Fe<sub>3</sub>C sobre colonias de perlita es la clave de la clase «Cementita + Perlita» (Callister y Rethwisch, 2020).</p>
+  <p>Si el fotógrafo encuadra solo el interior de una colonia, la etiqueta verdadera “cementita + perlita” se vuelve indistinguible de “perlita”. En laboratorio se enseña a barrer el campo a bajo aumento antes del zoom; la red, alimentada con recortes, no barre (DeCost et al., 2019).</p>
+
+  <h3>2.5.6 Ferrita Widmanstätten y perlita</h3>
+  <p>Variante morfológica en aceros de bajo o medio carbono enfriados con relativa rapidez —sin llegar al temple— o austenizados a temperatura excesiva (grano grueso). La ferrita proeutectoide crece en agujas o placas orientadas, no en granos redondeados, dentro de una matriz perlítica. Esa geometría reduce la tenacidad (Callister y Rethwisch, 2020).</p>
+  <p>Para el modelo, las placas alineadas son el rasgo discriminante frente a la ferrita equiaxial. El conjunto de prueba del modelo actual contiene más ejemplos de esta clase que de las demás (51 frente a ~28–32), lo que contribuye a que su F1 (0,893) sea sólido cuando el rasgo está presente (Tsutsui et al., 2020).</p>
+
+  <h3>2.5.7 Ferrita equiaxial y perlita</h3>
+  <p>Estructura de aceros hipoeutectoides (&lt; 0,77 % C) tras enfriamiento lento (por ejemplo, recocido). Antes de la perlita precipitan granos de ferrita proeutectoide de forma aproximadamente equiaxial en bordes de grano. Es común, fácil de mecanizar y tenaz. El contraste pedagógico con Widmanstätten es precisamente la forma del grano de ferrita, no la presencia de perlita, que ambas comparten (Callister y Rethwisch, 2020).</p>
+  <p>En este trabajo, el modelo actual identificó esta clase con precisión 1,0 y F1 0,984 en el conjunto de prueba de 239 imágenes. Conviene no mitificar ese resultado: el soporte es 32 imágenes de un mismo protocolo de split, no el universo de recocidos industriales.</p>
+
+  <h2>2.6 Identificación de microestructuras mediante micrografías</h2>
+  <p>El experto combina aumento, contraste, conocimiento del % C y del tratamiento, y un vocabulario morfológico: laminar, acicular, equiaxial, red continua, listón (Abdelal et al., 2026). El estudiante, al principio, solo tiene la imagen. Una red neuronal convolucional imita esa primera etapa —la del patrón visual— y no la segunda —la del razonamiento de proceso—. Por eso la herramienta presenta, junto a la etiqueta, un párrafo científico: para que la clasificación no se quede en un nombre (Nieves et al., 2025).</p>
+  <p>Los errores más frecuentes de un principiante coinciden, no por casualidad, con varias confusiones del modelo (capítulo 4): perlita frente a cementita + perlita; martensita frente a austenita; estructuras aciculares entre sí. Esa coincidencia convierte a la matriz de confusión en material de clase, no solo en métrica (Almeida et al., 2025).</p>
+
+  <h2>2.7 Inteligencia artificial</h2>
+  <p>En este trabajo, “inteligencia artificial” no significa una máquina que razona como un metalógrafo. Significa un programa capaz de mirar una foto y proponer un nombre de microestructura, porque vio muchos ejemplos etiquetados. Russell y Norvig (2021) sitúan esta idea en el campo más amplio de la IA; SEAS (2024) recuerda su peso actual en educación e industria. MetalVision AI ocupa un rincón estrecho de ese campo: clasificación de imágenes, sin diálogo ni diagnóstico de fallas.</p>
+
+  <h2>2.8 Aprendizaje automático y aprendizaje profundo</h2>
+  <div class="plain">
+    <p><strong>En palabras simples.</strong> El aprendizaje automático ajusta un modelo con ejemplos. El aprendizaje profundo lo hace con muchas capas, de modo que la red aprende sola qué mirar en la foto (bordes, láminas, agujas) en lugar de que un experto diseñe a mano cada regla (Goodfellow et al., 2016; LeCun et al., 2015; Xu y Zhang, 2022).</p>
+  </div>
+  <p>La ventaja, en metalografía, es captar texturas sutiles. El costo es necesitar fotos bien etiquetadas y evaluar el modelo con imágenes que no usó para aprender, para no autoengañarse (Müller et al., 2024; Chaurasia et al., 2023).</p>
+
+  <h2>2.9 Redes neuronales convolucionales</h2>
+  <div class="plain">
+    <p><strong>En palabras simples.</strong> Una red neuronal convolucional (CNN) recorre la micrografía como con una lupa. Primero detecta bordes y cambios de color; después arma texturas (láminas de perlita, placas, redes); al final elige, entre siete nombres, el más probable. La última capa convierte esos siete números en porcentajes que suman 100 % (función softmax) (Goodfellow et al., 2016; LeCun et al., 2015; Dragon1, s. f.; BasicAI, s. f.).</p>
+  </div>
+  <p>Las CNN constituyen una de las técnicas más utilizadas del aprendizaje profundo para el reconocimiento de imágenes. Están diseñadas para identificar patrones espaciales, extrayendo automáticamente bordes, texturas y formas (Goodfellow et al., 2016; LeCun et al., 2015).</p>
+  <figure>
+    <div class="fig-box">
+      <svg viewBox="0 0 700 200" width="100%" xmlns="http://www.w3.org/2000/svg">
+        <rect width="700" height="200" fill="#f7faf8"/>
+        <rect x="20" y="50" width="70" height="90" fill="#cfe8d9" stroke="#053d2a"/>
+        <text x="55" y="98" text-anchor="middle" font-size="11">Imagen</text>
+        <text x="55" y="114" text-anchor="middle" font-size="9">224×224</text>
+        <rect x="130" y="40" width="90" height="110" fill="#9ad4b8" stroke="#053d2a"/>
+        <text x="175" y="95" text-anchor="middle" font-size="11">Convolución</text>
+        <text x="175" y="112" text-anchor="middle" font-size="9">filtros / ReLU</text>
+        <rect x="250" y="55" width="80" height="80" fill="#6bb894" stroke="#053d2a"/>
+        <text x="290" y="98" text-anchor="middle" font-size="11">Pooling</text>
+        <rect x="360" y="40" width="100" height="110" fill="#2f7a5d" stroke="#053d2a"/>
+        <text x="410" y="90" text-anchor="middle" font-size="11" fill="#fff">Bloques</text>
+        <text x="410" y="108" text-anchor="middle" font-size="9" fill="#fff">MobileNetV2</text>
+        <rect x="490" y="60" width="80" height="70" fill="#e7f3ec" stroke="#053d2a"/>
+        <text x="530" y="92" text-anchor="middle" font-size="10">GAP +</text>
+        <text x="530" y="108" text-anchor="middle" font-size="10">Dropout</text>
+        <rect x="600" y="50" width="80" height="90" fill="#006341" stroke="#053d2a"/>
+        <text x="640" y="90" text-anchor="middle" font-size="11" fill="#fff">Softmax</text>
+        <text x="640" y="108" text-anchor="middle" font-size="9" fill="#fff">7 clases</text>
+        <path d="M90 95 H130 M220 95 H250 M330 95 H360 M460 95 H490 M570 95 H600" stroke="#053d2a"/>
+      </svg>
+    </div>
+    <figcaption>Figura 1. Esquema de una CNN de clasificación, adaptado al flujo de MicrostructureCNN. La imagen entra como matriz de píxeles; las capas convolucionales construyen mapas de características; el agrupamiento reduce resolución; la cabeza densa produce siete probabilidades (Dragon1, s. f.; LeCun et al., 2015).</figcaption>
+  </figure>
+  <p>Durante el entrenamiento se ajustan los números internos de la red (pesos) con fotos de entrenamiento y se comprueba con fotos de validación y de prueba. En la práctica, estos modelos se programan en Python con librerías como TensorFlow, Keras y PyTorch (Sánchez Martínez, 2018). En este proyecto se usaron las tres en momentos distintos: PyTorch en el prototipo de Colab; TensorFlow/Keras en el modelo actual de la aplicación.</p>
+  <p>MobileNetV2 es una red relativamente liviana: sirve para un servidor académico sin GPU dedicada. No se eligió “la más profunda”, sino una que se puede usar en la página. Otros trabajos de aceros usan redes más grandes o segmentación píxel a píxel (Azimi et al., 2018; Durmaz et al., 2023; Zhang et al., 2020). Este grado busca otra cosa: un nombre de microestructura para toda la foto, visible en pantalla.</p>
+  <p>Diversos estudios han aplicado redes neuronales a microestructuras de aceros. Azimi et al. (2018) desarrollaron una segmentación píxel a píxel con una red totalmente convolucional, alcanzando 93,94 % de exactitud. DeCost et al. (2019) emplearon CNN para segmentar microestructuras complejas en aceros de ultralto carbono. Durmaz et al. (2023) propusieron aprendizaje profundo para control de calidad. Tsutsui et al. (2020, 2022) aplicaron CNN a imágenes de microscopía electrónica de barrido y mostraron que conjuntos diversos mejoran la clasificación. Gupta et al. (2026) reportaron cifras altas en entrenamiento y menores en prueba para un clasificador de imagen completa. A pesar de estos avances, el uso de redes neuronales como herramienta didáctica en la formación de ingenieros metalúrgicos sigue siendo limitado (Nieves et al., 2025; Kumar et al., 2021).</p>
+
+  <h2>2.10 Aprendizaje por transferencia</h2>
+  <div class="plain">
+    <p><strong>En palabras simples.</strong> En lugar de enseñar a la red a ver desde cero, se toma una red que ya aprendió a reconocer formas en millones de fotos cotidianas (ImageNet) y solo se le enseña el significado de las siete microestructuras. Eso se llama aprendizaje por transferencia. Es como reutilizar un ojo entrenado y pegarle una leyenda nueva (Goodfellow et al., 2016).</p>
+  </div>
+  <p>Entrenar una CNN moderna desde cero exige muchísimas imágenes. El aprendizaje por transferencia reutiliza una red que ya sabe ver formas y solo le enseña las siete microestructuras (Goodfellow et al., 2016; Xu y Zhang, 2022).</p>
+  <p>En la práctica de este trabajo la transferencia ocurrió en dos tiempos: primero se congeló la base y se entrenó la cabeza de clasificación; después se descongelaron las últimas capas para un ajuste fino. El segundo tiempo <em>empeoró</em> la exactitud de prueba (aproximadamente 70,7 % frente a 90,0 %). El modelo de producción es, por tanto, el de la primera etapa (<code>best_head</code>). Con un dominio estrecho y un conjunto no masivo, un ajuste fino agresivo puede destruir representaciones útiles (Chaurasia et al., 2023).</p>
+
+  <h2>2.11 Procesamiento y aumento de imágenes</h2>
+  <p>Una CNN no “ve” la foto del microscopio tal como la ve el estudiante. Ve un arreglo numérico (tensor). Si entrenamiento e inferencia no fabrican el mismo tensor, el modelo se comporta como si le mostraran otro material. Por eso el preprocesado es parte del modelo, no un detalle de implementación (Tsutsui et al., 2022).</p>
+  <p>En MetalVision AI el pipeline compartido es: corrección de orientación EXIF, conversión a RGB, redimensionado a 224×224 con interpolación Lanczos y la normalización de MobileNetV2 (<code>mobilenet_v2.preprocess_input</code>), que lleva los valores de [0, 255] a un rango centrado próximo a [−1, 1]. El aumento de datos —volteos, rotaciones, zoom, traslación, brillo y contraste— se aplica solo al conjunto de entrenamiento, en línea, para que el modelo no memorice la orientación de la platina ni condiciones de iluminación accidentales. Las variantes de una misma foto origen se mantienen en la misma partición para no filtrar información entre conjuntos (Goodfellow et al., 2016).</p>
+
+  <h2>2.12 Métricas de evaluación para modelos de clasificación</h2>
+  <div class="plain">
+    <p><strong>En palabras simples.</strong> La <strong>exactitud</strong> cuenta cuántas fotos se acertaron en total. La <strong>precisión</strong> de una clase pregunta: cuando el modelo dice “es X”, ¿cuántas veces tenía razón? La <strong>exhaustividad</strong> (recall) pregunta: de todas las fotos que sí eran X, ¿cuántas encontró? El <strong>F1</strong> es un número que equilibra dos cuidados: no inventar una clase cuando no está (precisión) y no olvidarla cuando sí está (exhaustividad o recall). La <strong>matriz de confusión</strong> muestra, casilla a casilla, qué se confundió con qué.</p>
+  </div>
+  <p>Con siete clases y cierto desbalance, la exactitud sola no basta. El promedio <em>macro</em> trata igual a cada clase; el <em>ponderado</em> pesa por el número de ejemplos. En este trabajo se reportan exactitud, precisión, exhaustividad, F1 y matriz, sobre las 239 imágenes que el modelo actual no usó para ajustar pesos (Müller et al., 2024; Gupta et al., 2026).</p>
+  <p class="center">Precisión = VP / (VP + FP)&emsp;&emsp;Exhaustividad = VP / (VP + FN)&emsp;&emsp;F1 = 2 · Precisión · Exhaustividad / (Precisión + Exhaustividad)</p>
+  <p>Donde VP, FP y FN son verdaderos positivos, falsos positivos y falsos negativos de una clase. Hacer este cálculo en clase convierte la métrica en oficio, no en magia de una librería (Sánchez Martínez, 2018).</p>
+</section>
+
+<section class="page">
+  <h1 class="chapter">3. METODOLOGÍA EXPERIMENTAL</h1>
+
+  <h2>3.1 Revisión bibliográfica</h2>
+  <p>Se revisaron tres frentes. El primero, metalurgia física de aceros al carbono: diagrama Fe–C, transformaciones y atlas metalográficos, para fijar un vocabulario de siete clases enseñable (Callister y Rethwisch, 2020). El segundo, visión por computador aplicada a microestructuras (Azimi et al., 2018; DeCost et al., 2019; Durmaz et al., 2023; Tsutsui et al., 2022; Gupta et al., 2026). El tercero, ingeniería de software de un prototipo didáctico: separación entre interfaz, API, inferencia y entrenamiento, sin cuentas de usuario. La revisión no buscó el estado del arte de la segmentación industrial; buscó decisiones transferibles a un producto de aula: clasificación de imagen completa, transferencia de aprendizaje y métricas interpretables (Kumar et al., 2021; Zhang et al., 2020).</p>
+  <p>Azimi et al. (2018) siguen siendo la referencia de ruptura: pasaron de descriptores diseñados a mano a una red totalmente convolucional con votación por objeto. Su lección para este grado no es copiar esa arquitectura, sino aceptar que el píxel y el objeto metalográfico no coinciden, y que una etiqueta de imagen completa es una simplificación pedagógica. DeCost et al. (2019) mostraron, en aceros de ultralto carbono, que una CNN puede segmentar redes de cementita y otras morfologías complejas. Ese horizonte —cuantificar, no solo nombrar— queda fuera del alcance, pero orienta las recomendaciones (Bargmann et al., 2018).</p>
+  <p>Durmaz et al. (2023) recuerdan que incluso expertos pueden discrepar al graduar agujas de martensita y bainita. Tsutsui et al. (2020, 2022) muestran que la diversidad del conjunto de fotos importa tanto como la red. Gupta et al. (2026) reportan un clasificador de imagen completa con caída entre entrenamiento y prueba, ancla útil para leer los resultados de este trabajo. Goodfellow et al. (2016) y LeCun et al. (2015) anclan el vocabulario de CNN. El vacío que esta revisión confirma es el de herramientas pensadas para el estudiante de ingeniería metalúrgica, con interfaz en español y límites de uso claros (Nieves et al., 2025).</p>
+
+  <h2>3.2 Definición de las microestructuras a identificar</h2>
+  <p>Las siete etiquetas y su orden oficial de entrenamiento se centralizaron en un único archivo JSON compartido por el modelo, el backend, el frontend y la base de datos (<code>shared/microstructure_classes.json</code>). Ese orden es el de la capa de salida: el índice 0 es austenita y el 6 es martensita. Alterarlo rompería el artefacto entrenado.</p>
+  <table>
+    <caption>Tabla 1. Clases oficiales (orden de entrenamiento) y slug de carpeta.</caption>
+    <thead><tr><th>Índice</th><th>Nombre</th><th>Slug</th><th>Naturaleza</th></tr></thead>
+    <tbody>
+      <tr><td>0</td><td>Austenita</td><td>austenita</td><td>Fase</td></tr>
+      <tr><td>1</td><td>Ferrita</td><td>ferrita</td><td>Fase</td></tr>
+      <tr><td>2</td><td>Perlita</td><td>perlita</td><td>Microconstituyente</td></tr>
+      <tr><td>3</td><td>Cementita + Perlita</td><td>cementita-perlita</td><td>Asociación</td></tr>
+      <tr><td>4</td><td>Perlita + Ferrita Widmanstätten</td><td>perlita-ferrita-widmanstatten</td><td>Asociación morfológica</td></tr>
+      <tr><td>5</td><td>Perlita + Ferrita Equiaxial</td><td>perlita-ferrita-equiaxial</td><td>Asociación morfológica</td></tr>
+      <tr><td>6</td><td>Martensita</td><td>martensita</td><td>Fase (no equilibrio)</td></tr>
+    </tbody>
+  </table>
+  <p>A partir de la etiqueta de siete clases, la aplicación también reporta presencia o ausencia derivada de ferrita, perlita y cementita, como ayuda didáctica adicional, sin pretender cuantificar fracciones de área.</p>
+
+  <h2>3.3 Obtención y organización del conjunto de datos</h2>
+  <h3>3.3.1 Selección de las imágenes metalográficas</h3>
+  <p>Se reunieron micrografías de aceros al carbono correspondientes a las siete clases, en formatos habituales de imagen. El criterio de inclusión fue que un observador formado pudiera asignar una etiqueta dominante de las siete, no que la imagen ilustrara simultáneamente varias fases en fracciones comparables (Tsutsui et al., 2020). Las imágenes de usuario de la aplicación no entran al dataset: se procesan en memoria y se descartan.</p>
+  <h3>3.3.2 Clasificación de las imágenes</h3>
+  <p>Cada archivo se depositó en la carpeta cuyo slug coincide con la etiqueta, bajo <code>ml/data/raw/</code>. Esa carpeta <em>es</em> la etiqueta de supervisión. No hay un archivo de anotación aparte. Variantes de una misma foto se agrupan con la imagen origen para el particionado.</p>
+  <h3>3.3.3 Organización del conjunto de datos</h3>
+  <p>El dataset no se versiona en Git. El split no se hace al azar por archivo, sino <em>por grupo de origen</em>: todas las variantes de una misma micrografía quedan en entrenamiento, o en validación, o en prueba. Fracciones nominales del modelo actual: 70 % / 20 % / 10 %, con semilla 42. Tamaños resultantes: 1699 / 466 / 239. Así se evita el error clásico de evaluar el modelo con una copia volteada de una foto que ya “vio” (Chaurasia et al., 2023).</p>
+
+  <h2>3.4 Preprocesamiento de las imágenes</h2>
+  <h3>3.4.1 Redimensionamiento y normalización</h3>
+  <p>Toda imagen, en entrenamiento o en la API, pasa por el mismo pipeline: corrección EXIF, RGB, 224×224 Lanczos y <code>mobilenet_v2.preprocess_input</code>. El servidor valida antes extensión, tipo MIME, tamaño (máximo 25 MB) y que los bytes correspondan a una imagen legible. No se persiste el archivo.</p>
+  <h3>3.4.2 Aumento de datos</h3>
+  <p>En el conjunto de entrenamiento se aplican, de forma conjunta y solo en línea: volteo horizontal y vertical, rotación, zoom, traslación, brillo y contraste. Validación y prueba no se aumentan. El objetivo es invariancia a la orientación y a variaciones de iluminación, no inventar nuevas metalurgias (Goodfellow et al., 2016).</p>
+
+  <h2>3.5 Selección y configuración del modelo</h2>
+  <h3>3.5.1 Selección de la arquitectura: Colab frente a Keras</h3>
+  <div class="plain">
+    <p><strong>En palabras simples — prototipo y modelo actual.</strong></p>
+    <p><strong>Prototipo (Google Colab).</strong> Un cuaderno en la nube de Google con GPU, usado solo para el prototipo. Se entrenó una primera CNN con PyTorch y MobileNetV2. Demostró que las siete clases eran aprendibles: 96,9 % de exactitud en 359 fotos de prueba. Quedó archivado y <em>no</em> es el que carga la página web. Su orden de clases era alfabético, distinto del orden oficial de la Escuela.</p>
+    <p><strong>Modelo actual (Keras).</strong> Una librería de Python, encima de TensorFlow, con la que se arma y entrena la red de forma práctica. Se reentrenó la misma idea —MobileNetV2 con transferencia de aprendizaje— para integrarla al servidor. El orden de las siete salidas coincide con el catálogo de la Escuela. Este es MicrostructureCNN, el modelo de producción (checkpoint <code>best_head</code>).</p>
+  </div>
+  <p>Se eligió MobileNetV2 porque ya “sabe ver” formas, es relativamente liviana para un servidor académico y tanto PyTorch como Keras la ofrecen (Sánchez Martínez, 2018; Azimi et al., 2018).</p>
+  <figure>
+    <div class="fig-box">
+      <p class="center small"><strong>Figura 4. MicrostructureCNN</strong></p>
+      <p class="center small">Entrada 224×224×3 → MobileNetV2 (ImageNet, sin cabeza original) → promedio global espacial → Dropout(0,2) → capa densa de 7 salidas con softmax</p>
+    </div>
+    <figcaption>Figura 4. La base extrae rasgos; la cabeza decide entre las siete etiquetas del JSON canónico.</figcaption>
+  </figure>
+  <h3>3.5.2 Configuración de hiperparámetros</h3>
+  <table>
+    <caption>Tabla 2. Hiperparámetros principales del entrenamiento Keras documentado.</caption>
+    <thead><tr><th>Parámetro</th><th>Valor</th></tr></thead>
+    <tbody>
+      <tr><td>Tamaño de imagen</td><td>224 × 224</td></tr>
+      <tr><td>Lote</td><td>32</td></tr>
+      <tr><td>Semilla</td><td>42</td></tr>
+      <tr><td>Épocas cabeza (CLI documentada)</td><td>12</td></tr>
+      <tr><td>Tasa de aprendizaje (cabeza)</td><td>1 × 10<sup>−3</sup></td></tr>
+      <tr><td>Épocas de ajuste fino</td><td>6 (evaluado y no adoptado)</td></tr>
+      <tr><td>Tasa de aprendizaje (ajuste fino)</td><td>~1 × 10<sup>−4</sup></td></tr>
+      <tr><td>Partición train / val / test</td><td>1699 / 466 / 239</td></tr>
+      <tr><td>Dropout</td><td>0,2</td></tr>
+      <tr><td>Optimizador</td><td>Adam</td></tr>
+      <tr><td>Checkpoint seleccionado</td><td>best_head</td></tr>
+    </tbody>
+  </table>
+  <h3>3.5.3 Función de pérdida y optimización</h3>
+  <p>La red aprende comparando su respuesta con la etiqueta verdadera mediante entropía cruzada categórica dispersa, y corrige los pesos con el algoritmo Adam. Se calcularon pesos de clase inversamente proporcionales a la frecuencia en entrenamiento, para que las clases con menos imágenes no quedaran silenciadas (Goodfellow et al., 2016).</p>
+
+  <h2>3.6 Entrenamiento de la red neuronal</h2>
+  <p>El prototipo de Colab se entrenó en PyTorch como prueba de concepto. El modelo actual se entrena en el entorno del proyecto, con Python 3.11:</p>
+  <pre>source .venv/bin/activate
+PYTHONPATH=. python -m ml.src.training.train --epochs 12 --fine-tune-epochs 6</pre>
+  <p>En Keras hay dos tiempos. Primero se deja fija la red que ya sabía ver y solo se entrena la capa de las siete clases (se guarda el mejor resultado en validación: <code>best_head</code>). Después se intenta un ajuste fino abriendo las últimas capas; ese segundo tiempo empeoró la prueba (~70,7 %) y no se adoptó. El archivo que debe usar la aplicación es el de la primera etapa. El prototipo de Colab permanece aparte, como evidencia de que el camino era viable, no como motor de la web.</p>
+
+  <h2>3.7 Validación y evaluación del modelo</h2>
+  <p>La validación guió la selección del checkpoint y el ajuste de la tasa de aprendizaje. La evaluación reportada como resultado oficial de la herramienta es la de <strong>prueba</strong> del modelo Keras <code>best_head</code>: 239 imágenes, exactitud 90,0 %, F1 macro 90,0 %. Las pruebas automatizadas del repositorio verifican el orden de clases, la forma de salida (7 probabilidades) y reglas de la API; no sustituyen la evaluación metalográfica (Müller et al., 2024).</p>
+
+  <h2>3.8 Desarrollo de la aplicación MetalVision AI</h2>
+  <figure>
+    <div class="fig-box">
+      <p class="center small"><strong>Figura 3. Arquitectura lógica</strong></p>
+      <p class="center small">Navegador (React + Vite) → HTTPS → FastAPI (validación e inferencia) → CNN Keras en memoria → respuesta JSON. Opcionalmente, Supabase guarda catálogo, metadatos del modelo y estadísticas anónimas. Las imágenes de predicción no se almacenan de forma permanente.</p>
+    </div>
+    <figcaption>Figura 3. Separación deliberada: la interfaz no conoce los pesos; el modelo no conoce al usuario; la base de datos no guarda la micrografía.</figcaption>
+  </figure>
+  <h3>3.8.1 Diseño de la interfaz</h3>
+  <p>La interfaz es una página pública con identidad visual UIS (verde institucional más claro), idioma español/inglés y tema claro/oscuro. Al entrar, el estudiante ve de inmediato tres plataformas independientes —Básica (verde), Principiante (azul/turquesa) y Experto (ámbar)— con progresión sugerida Básica → Principiante → Experto. Acompaña la navegación la mascota Babi (babilla animada con burbujas de diálogo). No hay autenticación. Se reutilizan el banco de micrografías y la API/CNN existentes: Básica no llama al modelo; Principiante y Experto usan el mismo <code>POST /api/v1/predict</code>. El detalle de cada nivel está en la sección 4.7 (Universidad Industrial de Santander, s. f.).</p>
+  <h3>3.8.2 Integración del modelo</h3>
+  <p>El backend (FastAPI) carga el artefacto Keras una vez. Endpoints principales: <code>POST /api/v1/predict</code>, <code>GET /api/v1/classes</code>, <code>GET /api/v1/model</code> y <code>/health</code>. Al arrancar, comprueba que los nombres de clase del checkpoint coincidan con el JSON canónico y que la capa de salida tenga 7 unidades. Si el archivo no está, la predicción responde con error de servicio: no se simulan predicciones.</p>
+  <h3>3.8.3 Proceso de predicción</h3>
+  <p>Flujo: el usuario elige archivos → el cliente valida formato y tamaño de lote → envío multipart a <code>POST /api/v1/predict</code> → FastAPI valida y preprocesa en memoria → predicción del modelo → se toma la clase de mayor probabilidad y se ordenan las siete → JSON con clase, confianza, ranking, metadatos y, cuando aplica, presencia/ausencia derivada de ferrita, perlita y cementita → opcionalmente se inserta un análisis anónimo → se descartan los bytes de la imagen.</p>
+  <figure>
+    <div class="fig-box">
+      <p class="center small"><strong>Figura 5. Flujo de predicción</strong></p>
+      <ol class="small">
+        <li>El navegador envía el archivo a <code>POST /api/v1/predict</code>.</li>
+        <li>FastAPI valida tamaño, tipo y contenido real de la imagen.</li>
+        <li>Se decodifica a RGB, se redimensiona y se aplica el mismo <code>preprocess_input</code> del entrenamiento.</li>
+        <li>El predictor en caché ejecuta la CNN y obtiene siete probabilidades.</li>
+        <li>Se responde JSON; si falla el registro anónimo opcional, la predicción no falla.</li>
+        <li>Los bytes de la imagen se descartan.</li>
+      </ol>
+    </div>
+    <figcaption>Figura 5. El estudiante nunca habla directamente con Keras: habla con una API que replica el preprocesado del entrenamiento.</figcaption>
+  </figure>
+
+  <h2>3.9 Pruebas funcionales de la aplicación</h2>
+  <p>Se probaron, de forma automatizada y manual: salud del servicio, catálogo de clases, rechazo de archivos inválidos, predicción cuando el modelo está cargado, y el flujo de interfaz (carga, análisis, visualización). Criterio de aceptación pedagógico: el estudiante debe poder completar el ciclo “subir → leer etiqueta y texto → comparar con el catálogo” sin crear cuenta.</p>
+</section>
+
+<section class="page">
+  <h1 class="chapter">4. RESULTADOS Y ANÁLISIS</h1>
+  <p>Este capítulo presenta los números de los dos modelos. El prototipo de Google Colab muestra que la clasificación era posible. El modelo actual, el de la página, es el que debe leerse como resultado oficial de la herramienta didáctica. Ninguna cifra se simuló: las del modelo Keras salen de <code>ml/models/trained/metrics.json</code>.</p>
+
+  <div class="kpi">
+    <div><strong>96,9 %</strong>prototipo Colab (n = 359)</div>
+    <div><strong>90,0 %</strong>modelo actual Keras (n = 239)</div>
+    <div><strong>70,7 %</strong>ajuste fino (descartado)</div>
+  </div>
+
+  <h2>4.1 Caracterización del conjunto de prueba (modelo actual)</h2>
+  <p>La Tabla 3 muestra el soporte del conjunto de prueba del modelo Keras: cuántas micrografías de cada clase se usaron solo para evaluar. El desbalance más visible es la clase «Perlita + Ferrita Widmanstätten» (51 imágenes frente a 28–32 en las demás).</p>
+  <table>
+    <caption>Tabla 3. Distribución del conjunto de prueba independiente del modelo actual (n = 239).</caption>
+    <thead><tr><th>Microestructura</th><th>Imágenes (soporte)</th><th>Porcentaje</th></tr></thead>
+    <tbody>
+      <tr><td>Austenita</td><td>32</td><td>13,4 %</td></tr>
+      <tr><td>Ferrita</td><td>32</td><td>13,4 %</td></tr>
+      <tr><td>Perlita</td><td>32</td><td>13,4 %</td></tr>
+      <tr><td>Cementita + Perlita</td><td>28</td><td>11,7 %</td></tr>
+      <tr><td>Perlita + Ferrita Widmanstätten</td><td>51</td><td>21,3 %</td></tr>
+      <tr><td>Perlita + Ferrita Equiaxial</td><td>32</td><td>13,4 %</td></tr>
+      <tr><td>Martensita</td><td>32</td><td>13,4 %</td></tr>
+      <tr><td><strong>Total</strong></td><td><strong>239</strong></td><td><strong>100 %</strong></td></tr>
+    </tbody>
+  </table>
+  <p>Las imágenes son metalografías ópticas (o equivalentes digitales) en color RGB tras el pipeline, a distintos aumentos y condiciones de ataque. El modelo no recibe metadatos de aumento ni de % C: solo el tensor 224×224 (Tsutsui et al., 2022).</p>
+
+  <h2>4.2 Comparación prototipo Colab y modelo Keras</h2>
+  <table>
+    <caption>Tabla 6. Prototipo entrenado en Google Colab y modelo actual de la aplicación.</caption>
+    <thead><tr><th></th><th>Prototipo (Colab)</th><th>Modelo actual (aplicación)</th></tr></thead>
+    <tbody>
+      <tr><td>Dónde se entrenó</td><td>Google Colab (GPU en la nube)</td><td>Entorno local del proyecto (Python 3.11)</td></tr>
+      <tr><td>Librería</td><td>PyTorch</td><td>TensorFlow / Keras</td></tr>
+      <tr><td>Red de base</td><td>MobileNetV2</td><td>MobileNetV2</td></tr>
+      <tr><td>Fotos de prueba</td><td>n = 359</td><td>n = 239 (split 1699 / 466 / 239)</td></tr>
+      <tr><td>Orden de las 7 clases</td><td>Alfabético (histórico)</td><td>Orden oficial de la Escuela</td></tr>
+      <tr><td>Exactitud en prueba</td><td>96,9 %</td><td>90,0 %</td></tr>
+      <tr><td>F1 macro en prueba</td><td>—</td><td>90,0 %</td></tr>
+      <tr><td>¿Lo usa MetalVision AI?</td><td>No (archivo histórico)</td><td>Sí (best_head)</td></tr>
+    </tbody>
+  </table>
+  <p>El prototipo de Colab fue más alto en el número de aciertos sobre su propio conjunto de prueba. No se eligió para la web porque el proyecto adoptó Keras como marco oficial, porque el orden de clases debía coincidir con el catálogo de la Escuela, y porque la aplicación necesita un archivo cargable de forma estable por el servidor. Un 96,9 % en un prototipo no “anula” un 90,0 % en producción: son dos etapas del mismo trabajo. El 90,0 % es el desempeño de la herramienta que el estudiante realmente usa (Gupta et al., 2026; Azimi et al., 2018).</p>
+
+  <h2>4.3 Checkpoints Keras: cabeza frente a ajuste fino</h2>
+  <table>
+    <caption>Tabla 7. Exactitud y F1 macro en prueba para los checkpoints Keras.</caption>
+    <thead><tr><th>Versión Keras</th><th>Exactitud</th><th>F1 macro</th><th>Decisión</th></tr></thead>
+    <tbody>
+      <tr><td>Solo la capa de clasificación (base fija), best_head</td><td>90,0 %</td><td>90,0 %</td><td>Elegida para la aplicación</td></tr>
+      <tr><td>Ajuste fino de últimas capas</td><td>~70,7 %</td><td>~71,4 %</td><td>Descartada</td></tr>
+    </tbody>
+  </table>
+  <p>Abrir más capas de la red, en este conjunto de fotos, no mejoró el resultado: lo empeoró. Más entrenamiento no es automáticamente mejor. El modelo que se entrega al estudiante es el de transferencia clásica (capa final), no el del ajuste fino (Chaurasia et al., 2023).</p>
+
+  <h2>4.4 Métricas por clase y matriz de confusión</h2>
+  <p>Sobre 239 micrografías, el modelo actual acertó 215 (90,0 %). Un clasificador al azar, con siete clases, esperaría cerca del 14 %. Ese 90,0 % queda en una banda realista frente a clasificadores de imagen completa reportados en la literatura reciente, y por debajo de trabajos de segmentación muy controlados, como corresponde a una herramienta didáctica con morfologías parecidas entre sí (Gupta et al., 2026; Azimi et al., 2018).</p>
+  <table>
+    <caption>Tabla 4. Métricas por clase en prueba (checkpoint best_head, n = 239).</caption>
+    <thead><tr><th>Clase</th><th>Precisión</th><th>Exhaustividad</th><th>F1</th><th>Soporte</th></tr></thead>
+    <tbody>
+      <tr><td>Austenita</td><td>0,842</td><td>1,000</td><td>0,914</td><td>32</td></tr>
+      <tr><td>Ferrita</td><td>1,000</td><td>0,969</td><td>0,984</td><td>32</td></tr>
+      <tr><td>Perlita</td><td>0,960</td><td>0,750</td><td>0,842</td><td>32</td></tr>
+      <tr><td>Cementita + Perlita</td><td>0,920</td><td>0,821</td><td>0,868</td><td>28</td></tr>
+      <tr><td>Perlita + Ferrita Widmanstätten</td><td>0,885</td><td>0,902</td><td>0,893</td><td>51</td></tr>
+      <tr><td>Perlita + Ferrita Equiaxial</td><td>1,000</td><td>0,969</td><td>0,984</td><td>32</td></tr>
+      <tr><td>Martensita</td><td>0,757</td><td>0,875</td><td>0,812</td><td>32</td></tr>
+      <tr><td>Promedio macro</td><td>0,909</td><td>0,898</td><td>0,900</td><td>239</td></tr>
+      <tr><td>Exactitud global</td><td colspan="3">0,900 (90,0 %)</td><td>239</td></tr>
+    </tbody>
+  </table>
+  <p>Las clases mejor resueltas son ferrita y perlita + ferrita equiaxial (F1 0,984; precisión 1,0). Las más difíciles por F1 son martensita (0,812) y perlita (0,842): el modelo las deja escapar hacia vecinas visuales o, en el caso de martensita, también recibe falsos positivos. La austenita tiene exhaustividad perfecta (1,0) pero precisión más baja (0,842): el modelo las reconoce todas, y además etiqueta como austenita algunas imágenes que no lo son.</p>
+  <p>Filas = clase verdadera; columnas = clase predicha. Orden: austenita, ferrita, perlita, cementita + perlita, Widmanstätten, equiaxial, martensita.</p>
+  <table class="cm">
+    <caption>Tabla 5. Matriz de confusión (n = 239). Diagonal: aciertos. Suma de la diagonal = 215.</caption>
+    <thead>
+      <tr>
+        <th></th>
+        <th>Aust.</th><th>Ferr.</th><th>Perl.</th><th>Cem+P</th><th>Widm.</th><th>Equi.</th><th>Mart.</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><th>Austenita</th><td class="diag">32</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+      <tr><th>Ferrita</th><td class="miss">1</td><td class="diag">31</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+      <tr><th>Perlita</th><td>0</td><td>0</td><td class="diag">24</td><td class="miss">1</td><td class="miss">3</td><td>0</td><td class="miss">4</td></tr>
+      <tr><th>Cem. + Perlita</th><td>0</td><td>0</td><td class="miss">1</td><td class="diag">23</td><td class="miss">2</td><td>0</td><td class="miss">2</td></tr>
+      <tr><th>Widmanstätten</th><td class="miss">2</td><td>0</td><td>0</td><td>0</td><td class="diag">46</td><td>0</td><td class="miss">3</td></tr>
+      <tr><th>Equiaxial</th><td>0</td><td>0</td><td>0</td><td class="miss">1</td><td>0</td><td class="diag">31</td><td>0</td></tr>
+      <tr><th>Martensita</th><td class="miss">3</td><td>0</td><td>0</td><td>0</td><td class="miss">1</td><td>0</td><td class="diag">28</td></tr>
+    </tbody>
+  </table>
+
+  <h2>4.5 Análisis metalúrgico de las predicciones</h2>
+  <h3>4.5.1 Ferrita</h3>
+  <p>31 de 32 ferritas correctas (exhaustividad 96,9 %). La única fuga fue hacia austenita: el modelo distingue bien “claro y suave” de “laminar”, pero duda entre dos fases de grano relativamente uniforme. En aula, eso invita a preguntar por magnetismo, por estabilidad a temperatura ambiente y por el ataque, no solo por el color (Callister y Rethwisch, 2020).</p>
+  <h3>4.5.2 Perlita</h3>
+  <p>24 de 32 (exhaustividad 75,0 %). Las fugas se reparten entre cementita + perlita (1), Widmanstätten (3) y martensita (4). Es decir: la perlita “pura” se confunde con otras estructuras oscuras o direccionales. Un recorte que muestre solo colonias laminares de un hipereutectoide puede ser indistinguible de la clase cementita + perlita si la red de Fe<sub>3</sub>C quedó fuera del campo (DeCost et al., 2019).</p>
+  <h3>4.5.3 Austenita</h3>
+  <p>32 de 32 (exhaustividad 100 %). El problema de la austenita no es reconocerla, sino que otras clases (ferrita 1, Widmanstätten 2, martensita 3) “caen” en ella: precisión 84,2 %. Visualmente, austenita retenida, ferrita poco atacada y martensita de bajo contraste pueden compartir un campo relativamente homogéneo a 224×224 (Müller et al., 2024).</p>
+  <h3>4.5.4 Martensita</h3>
+  <p>28 de 32 (exhaustividad 87,5 %), F1 0,812, el más bajo del conjunto. Tres martensitas se predijeron austenita y una Widmanstätten. Además, la martensita recibe falsos positivos desde perlita, cementita + perlita y Widmanstätten. La martensita acicular puede parecerse a placas de Widmanstätten; la martensita poco resuelta, a un campo austenítico (Durmaz et al., 2023).</p>
+  <h3>4.5.5 Cementita + perlita</h3>
+  <p>23 de 28 (exhaustividad 82,1 %). Las fugas van a perlita, Widmanstätten y martensita. La red de cementita proeutectoide es un rasgo fuerte cuando está en el recorte; cuando no, la clase colapsa hacia vecinas laminares u oscuras (Callister y Rethwisch, 2020).</p>
+  <h3>4.5.6 Perlita + ferrita Widmanstätten</h3>
+  <p>46 de 51 (exhaustividad 90,2 %). Dos fugas a austenita y tres a martensita. Las placas, si el recorte las corta mal o el contraste es bajo, dejan un fondo que el modelo asocia a fases más “lisas” o aciculares de temple. El F1 0,893 indica que, en conjunto, la morfología dirigida es aprendible (Tsutsui et al., 2020).</p>
+  <h3>4.5.7 Perlita + ferrita equiaxial</h3>
+  <p>31 de 32 (exhaustividad 96,9 %) y precisión perfecta en este conjunto. El único error fue hacia cementita + perlita: bordes de grano ocupados por una segunda fase clara pueden parecer red de Fe<sub>3</sub>C. El modelo casi nunca inventa esta clase cuando no corresponde.</p>
+
+  <h2>4.6 Familias de confusión</h2>
+  <p><strong>Familia laminar.</strong> Perlita ↔ cementita + perlita. Comparten colonias Fe<sub>3</sub>C/α; las diferencia un constituyente de borde que el recorte puede omitir (Azimi et al., 2018).</p>
+  <p><strong>Familia acicular.</strong> Martensita ↔ Widmanstätten ↔ (a veces) austenita. Agujas de origen distinto se parecen a resolución de red y a 224 píxeles (Durmaz et al., 2023).</p>
+  <p><strong>Familia de campo claro uniforme.</strong> Ferrita y martensita “cayendo” en austenita. Cuando la textura es débil, gana una clase residual de aspecto homogéneo. En clase, eso justifica el ataque metalográfico: sin contraste, ni el ojo ni la CNN discriminan (Almeida et al., 2025).</p>
+  <p>En esta matriz, equiaxial y Widmanstätten no se intercambiaron de forma sistemática. El modelo sí separa, en buena medida, la forma del grano de ferrita cuando ambas están bien representadas. Ese resultado es pedagógicamente alentador: la distinción que más cuesta explicar en el pizarrón es una de las que mejor resuelve la red.</p>
+
+  <h2>4.7 Funcionamiento de MetalVision AI como producto</h2>
+  <div class="plain">
+    <p><strong>Nota.</strong> Los cambios descritos aquí son de <em>producto e interfaz</em> (tres plataformas de aprendizaje, identidad visual y mascota). El endpoint de predicción (<code>POST /api/v1/predict</code>), el modelo Keras y el preprocesado se reutilizan sin alterarlos innecesariamente: Básica no llama a la CNN; Principiante y Experto usan la misma API existente.</p>
+  </div>
+  <p>MetalVision AI se diseñó como herramienta didáctica, no solo como clasificador. Al entrar, el estudiante ve de inmediato <strong>tres secciones grandes e independientes</strong> —plataformas o niveles— y puede dirigirse a cualquiera de ellas. La progresión sugerida es Básica → Principiante → Experto. No hay autenticación ni cuentas de usuario. La identidad visual sigue la línea UIS (verde institucional más claro), y cada nivel tiene su color propio: Básica en verde, Principiante en azul/turquesa y Experto en ámbar. Acompaña la experiencia una mascota tipo Duolingo: una babilla animada llamada <strong>Babi</strong> (sin cuadro de fondo, ojos blancos y tarjeta blanca, con burbujas de diálogo) (Universidad Industrial de Santander, s. f.).</p>
+
+  <h3>4.7.1 Básica — «Aprende a identificar»</h3>
+  <p>Sección didáctica e interactiva que usa el <strong>banco de micrografías existente</strong>, variado y dinámico por clase (varias imágenes, con lógica de juego: barajar, elegir otra foto, etc.). El objetivo es aprender a distinguir fases y microconstituyentes antes de pedir un veredicto automático.</p>
+  <p>La morfología característica de cada clase se explica de forma <strong>visual y sencilla</strong>, con tarjetas, botones e interacción —no solo texto—. Se muestran aumentos ópticos de <strong>100×, 200× y 500×</strong> y se enseña cómo cambia lo que se puede identificar al subir o bajar el aumento (por ejemplo, una perlita fina a bajo aumento puede parecer un gris uniforme). El flujo del nivel tiene dos momentos: primero <em>aprendizaje</em> (banco, morfología, ficha científica, aumentos) y después un <em>post-saberes</em> o comprobación con imágenes del mismo banco. En Básica <strong>no se llama a la CNN</strong> (Callister y Rethwisch, 2020; Müller et al., 2024).</p>
+
+  <h3>4.7.2 Principiante — «Identifica y comprueba»</h3>
+  <p>Aquí sí se mantiene el flujo de <strong>subir micrografía + CNN</strong>, pero con un paso pedagógico previo. Antes de mostrar la predicción, la interfaz hace <strong>preguntas visuales e interactivas</strong> —morfología, clase, rasgos característicos y aumento— mediante tarjetas o selección múltiple (sin escribir texto libre). Se <strong>registra la respuesta del usuario</strong>. Solo después se muestra la predicción de la CNN con su confianza, se <strong>compara</strong> la respuesta del estudiante con la del modelo (coinciden o no) y se ofrece una explicación breve de la microestructura. Ese contraste —acuerdo o desacuerdo argumentado— es el núcleo didáctico del nivel; la predicción sigue saliendo del mismo endpoint existente (Almeida et al., 2025; Universidad Industrial de Santander, s. f.).</p>
+
+  <h3>4.7.3 Experto — «Predicción CNN»</h3>
+  <p>Modo directo: subir imagen → predicción inmediata, <strong>sin preguntas previas</strong>. Se muestran clase, confianza e información complementaria (barras de las siete probabilidades, ficha científica y, cuando aplica, presencia/ausencia derivada de ferrita, perlita y cementita). Acepta formatos habituales (JPG, PNG, WEBP, TIFF), con límite de tamaño y opción de lote. No hay umbral de rechazo: una confianza baja debe verse, no ocultarse. Es el uso más cercano a un clasificador, pero enmarcado dentro de la ruta didáctica y con los mismos límites académicos del producto.</p>
+
+  <h3>4.7.4 Criterios de evaluación del producto didáctico</h3>
+  <p><strong>Accesibilidad.</strong> Sin autenticación. El ciclo completo cabe en una sesión de laboratorio de cómputo.</p>
+  <p><strong>Tres plataformas independientes.</strong> El hub inicial dirige de una vez a Básica, Principiante o Experto; cada una tiene identidad de color y propósito propio.</p>
+  <p><strong>Escalera de autonomía.</strong> Básica forma el vocabulario visual; Principiante exige criterio propio antes de la CNN; Experto entrega la predicción para revisión rápida. Así se evita que el primer contacto sea solo «pedir la respuesta».</p>
+  <p><strong>Reutilización técnica.</strong> Se reutilizan el banco de imágenes, la CNN y la API existentes; no se cambió el modelo ni el endpoint de predicción para construir los niveles.</p>
+  <p><strong>Retroalimentación inmediata.</strong> En Básica y Principiante el estudiante practica sin esperar la ronda del profesor; en Experto obtiene, en segundos, una hipótesis y un texto. El tiempo de ~15 minutos por imagen del experto no desaparece del laboratorio real; se complementa con práctica deliberada entre sesiones (Almeida et al., 2025).</p>
+  <p><strong>Transparencia de la duda.</strong> Las siete barras enseñan que la CNN reparte probabilidad; no «está segura» en abstracto.</p>
+  <p><strong>Límites explícitos.</strong> El aviso de que no sustituye al especialista, la ausencia de cuantificación de fases y las confusiones del capítulo 4.6 evitan el efecto oráculo (Nieves et al., 2025).</p>
+  <p><strong>Coherencia con los objetivos.</strong> Se construyó la CNN en Python (objetivo 1), se midió con métricas de clasificación —90,0 % de exactitud y 90,0 % de F1 macro en 239 imágenes— (objetivo 2) y se expuso una interfaz operativa por niveles (objetivo 3). El valor formativo está en el contraste entre la lectura del estudiante y la del modelo, no en la obediencia a la etiqueta (Universidad Industrial de Santander, s. f.).</p>
+  <p>Queda fuera de este capítulo una evaluación controlada con estudiantes (pretest/postest). El objetivo general habla de herramienta didáctica desarrollada, no de ensayo clínico educativo. Esa evaluación se formula como trabajo futuro en las recomendaciones.</p>
+</section>
+
+<section class="page">
+  <h1 class="chapter">5. CONCLUSIONES</h1>
+  <p>1. Fue posible desarrollar MetalVision AI, una herramienta didáctica basada en una red neuronal convolucional, para identificar siete microestructuras de aceros al carbono, con una página pública y números de evaluación explícitos.</p>
+  <p>2. El camino tuvo dos modelos. El prototipo de Google Colab (PyTorch) demostró que la clasificación era viable (96,9 % en 359 fotos de prueba). El modelo actual de la aplicación (TensorFlow/Keras, MicrostructureCNN, checkpoint <code>best_head</code>) cumple el primer objetivo específico, usa el orden de clases de la Escuela y es el que ve el estudiante (90,0 % de exactitud y 90,0 % de F1 macro en 239 fotos de prueba; partición 1699 / 466 / 239).</p>
+  <p>3. En el modelo actual, las clases de mejor F1 fueron ferrita y perlita + ferrita equiaxial (0,984); las de menor F1, martensita (0,812) y perlita (0,842). Esas cifras responden al segundo objetivo específico.</p>
+  <p>4. El ajuste fino de las últimas capas del modelo Keras bajó la exactitud de prueba a aproximadamente 70,7 % y no se usó. Más entrenamiento no significó, aquí, un mejor modelo para el aula.</p>
+  <p>5. Las confusiones del modelo actual (perlita frente a cementita + perlita o martensita; martensita frente a austenita o Widmanstätten) se parecen a las de un aprendiz. La matriz de confusión sirve para enseñar, no solo para puntuar.</p>
+  <p>6. La interfaz por niveles —tres plataformas independientes (Básica verde, Principiante azul/turquesa, Experto ámbar), con Babi, sin autenticación y reutilizando el banco y la API existentes— cumple el tercer objetivo específico. No reemplaza al metalógrafo; ofrece un espacio de práctica inmediata, alineado con el modelo pedagógico de la UIS.</p>
+</section>
+
+<section class="page">
+  <h1 class="chapter">6. RECOMENDACIONES</h1>
+  <p>1. <strong>Ampliar el atlas con casos límite.</strong> Incorporar, con etiquetado experto, recortes donde la red de cementita quede a medias, martensitas de bajo contraste y perlitas de distinto espaciado. El F1 de perlita y martensita es el cuello de botella medido.</p>
+  <p>2. <strong>Tratar el ajuste fino con más cautela.</strong> Si se retoma el descongelamiento, conviene menos capas, tasas menores y selección estricta por prueba. No reactivar un checkpoint de ajuste fino peor por el solo hecho de ser “más entrenado”.</p>
+  <p>3. <strong>Añadir un umbral didáctico de abstención.</strong> Cuando la probabilidad máxima sea baja o las dos primeras clases estén muy próximas, la interfaz podría decir “el modelo duda entre A y B” y remitir al catálogo.</p>
+  <p>4. <strong>No pedir al modelo lo que no se le enseñó.</strong> Fracción de fase, tamaño de grano ASTM, aceros aleados y bainita requieren otras etiquetas u otra tarea (segmentación).</p>
+  <p>5. <strong>Usar MetalVision AI como prelaboratorio, no como oráculo.</strong> Se recomienda un guion de clase: el estudiante clasifica a ojo, consulta la CNN, escribe por qué coincide o no, y solo entonces confronta con el profesor.</p>
+  <p>6. <strong>Mantener el preprocesado único.</strong> Cualquier cambio de tamaño, librería o normalización debe replicarse en entrenamiento e inferencia y cubrirse con pruebas automáticas.</p>
+  <p>7. <strong>Evaluar el impacto formativo con evidencia de aula.</strong> Este trabajo midió la CNN. Un siguiente paso es medir al estudiante: tiempo de identificación, tasa de error antes y después, y calidad de la argumentación.</p>
+  <p>8. <strong>Conservar el prototipo de Colab como archivo histórico</strong>, no reactivarlo en la web sin alinear el orden de clases y el formato Keras.</p>
+  <p>9. <strong>Versionar el modelo en el servidor</strong> cada vez que se reentrene, para que la página no anuncie una versión y ejecute otra.</p>
+  <p>10. <strong>Anotar el aumento óptico</strong> en el atlas, aunque la CNN no lo use: el estudiante sí lo necesita para no comparar una perlita a 1000× con un campo mixto a 50×.</p>
+</section>
+
+<section class="page">
+  <h1 class="chapter">BIBLIOGRAFÍA</h1>
+  <p class="ref">Abdelal, G., Chan, C.-W. y McLoone, S. (2026). A critical review of recent advances in AI-enhanced SEM and EDS techniques for metallic microstructure characterization. <em>Applied Sciences, 16</em>(2), 975. https://doi.org/10.3390/app16020975</p>
+  <p class="ref">Almeida, C. D. D., Filgueiras, T. T., Lagares, M. L., Jr., Macêdo, B. D. S., Saporetti, C. M., Bodini, M. y Goliatt, L. (2025). A CNN-based method for quantitative assessment of steel microstructures in welded zones. <em>Fibers, 13</em>(5), 66. https://www.mdpi.com/2079-6439/13/5/66</p>
+  <p class="ref">Azimi, S. M., Britz, D., Engstler, M., Fritz, M. y Mücklich, F. (2018). Advanced steel microstructural classification by deep learning methods. <em>Scientific Reports, 8</em>(1), 2128. https://doi.org/10.1038/s41598-018-20037-5</p>
+  <p class="ref">Bargmann, S., Klusemann, B., Markmann, J., Schnabel, J. E., Schneider, K., Soyarslan, C. y Wilmers, J. (2018). Generation of 3D representative volume elements for heterogeneous materials: A review. <em>Progress in Materials Science, 96</em>, 322-384. https://doi.org/10.1016/j.pmatsci.2018.02.003</p>
+  <p class="ref">BasicAI. (s. f.). A comprehensive guide: What are convolutional neural networks. https://www.basic.ai/blog-post/a-comprehensive-guide-to-convolutional-neural-networks</p>
+  <p class="ref">Callister, W. D. y Rethwisch, D. G. (2020). <em>Materials science and engineering: An introduction</em> (10.ª ed.). Wiley.</p>
+  <p class="ref">Chaurasia, N., Jha, S. K. y Sangal, S. (2023). A novel training methodology for phase segmentation of steel microstructures using a deep learning algorithm. <em>Materials Today: Advances, 30</em>, 101803. https://doi.org/10.1016/j.mtla.2023.101803</p>
+  <p class="ref">DeCost, B. L., Lei, B., Francis, T. y Holm, E. A. (2019). High throughput quantitative metallography for complex microstructures using deep learning: A case study in ultrahigh carbon steel. <em>Microscopy and Microanalysis, 25</em>(1), 21-29. https://doi.org/10.1017/s1431927618015635</p>
+  <p class="ref">Dragon1. (s. f.). Convolutional neural networks definition. https://www.dragon1.com/terms/convolutional-neural-networks-definition</p>
+  <p class="ref">Durmaz, A. R., Yildirim, M. y Koca, N. (2023). Deep learning-based quality control of steel microstructures using convolutional neural networks. <em>Journal of Materials Research and Technology, 24</em>, 1234-1245. https://doi.org/10.1016/j.jmrt.2023.02.015</p>
+  <p class="ref">Goodfellow, I., Bengio, Y. y Courville, A. (2016). <em>Deep learning</em>. MIT Press.</p>
+  <p class="ref">Gupta, A. K., Gupta, S., Ghosh, S. K. y Ganguly, S. (2026). Computer vision of ferrite, pearlite, austenite, bainite, and martensite: A deep learning framework toward high-throughput analysis of steel microstructure. <em>Computational Materials Science, 261</em>, 114319. https://doi.org/10.1016/j.commatsci.2025.114319</p>
+  <p class="ref">Kumar, A., Singh, A. y Gupta, R. (2021). Automated microstructure classification in steels using convolutional neural networks. <em>Materials Characterization, 174</em>, 110979. https://doi.org/10.1016/j.matchar.2021.110979</p>
+  <p class="ref">LeCun, Y., Bengio, Y. y Hinton, G. (2015). Deep learning. <em>Nature, 521</em>(7553), 436-444. https://doi.org/10.1038/nature14539</p>
+  <p class="ref">Müller, M., Stiefel, M., Bachmann, B.-I., Britz, D. y Mücklich, F. (2024). Overview: Machine learning for segmentation and classification of complex steel microstructures. <em>Metals, 14</em>(5), 553. https://www.mdpi.com/2075-4701/14/5/553</p>
+  <p class="ref">Nieves, J., Serena-Barriuso, A. y Elejoste-Rementeria, G. (2025). HawkEye: AI-driven software for objective analysis and characterization of ductile iron microstructures. <em>Applied Sciences, 15</em>(13), 6991. https://doi.org/10.3390/app15136991</p>
+  <p class="ref">Russell, S. y Norvig, P. (2021). <em>Artificial intelligence: A modern approach</em> (4.ª ed.). Pearson.</p>
+  <p class="ref">Sánchez Martínez, M. (2018). <em>Detección de personas mediante técnicas de aprendizaje automático: SVM y CNN</em> (Trabajo de fin de grado). Universidad Politécnica de Madrid. https://oa.upm.es/53880/1/TFG_MARINA_SANCHEZ_MARTINEZ.pdf</p>
+  <p class="ref">SEAS, Estudios Superiores Abiertos. (2024). La inteligencia artificial y su importancia actual y futura. https://www.seas.es/blog/informatica/que-es-la-ia-y-por-que-es-importante/</p>
+  <p class="ref">Tsutsui, K., Terasaki, H., Uto, K., Maemura, T., Hiramatsu, S., Hayashi, K., Moriguchi, K. y Morito, S. (2020). A methodology of steel microstructure recognition using SEM images by machine learning based on textural analysis. <em>Materials Today Communications, 25</em>, 101514. https://doi.org/10.1016/j.mtcomm.2020.101514</p>
+  <p class="ref">Tsutsui, K., Matsumoto, K., Maeda, M., Takatsu, T., Moriguchi, K., Hayashi, K., Morito, S. y Terasaki, H. (2022). Mixing effects of SEM imaging conditions on convolutional neural network-based low-carbon steel classification. <em>Materials Today Communications, 32</em>, 104062. https://doi.org/10.1016/j.mtcomm.2022.104062</p>
+  <p class="ref">Universidad Industrial de Santander. (s. f.). Modelo pedagógico institucional. UIS.</p>
+  <p class="ref">Xu, Y. y Zhang, H. (2022). Convergence of deep convolutional neural networks. <em>Neural Networks, 154</em>, 367-381. https://doi.org/10.1016/j.neunet.2022.06.031</p>
+  <p class="ref">Zhang, Y., Ling, C. y Ding, H. (2020). Deep learning-based segmentation of metallographic images for quantitative analysis. <em>Computational Materials Science, 172</em>, 109286. https://doi.org/10.1016/j.commatsci.2019.109286</p>
+</section>
+
+<section class="page">
+  <h1 class="chapter">ANEXOS</h1>
+
+  <h2>ANEXO A. Arquitectura en palabras simples</h2>
+  <p>MetalVision AI se puede imaginar como tres habitaciones conectadas:</p>
+  <ol>
+    <li><strong>La página (React/Vite).</strong> Es lo que ve el estudiante: botones, arrastre de fotos, barras de probabilidad y textos. No conoce los pesos de la red.</li>
+    <li><strong>El servidor (FastAPI).</strong> Recibe la foto, comprueba que sea una imagen válida, la prepara exactamente igual que en el entrenamiento y le pide una respuesta al modelo. Expone rutas como <code>/api/v1/predict</code>, <code>/api/v1/classes</code>, <code>/api/v1/model</code> y <code>/health</code>.</li>
+    <li><strong>El modelo (Keras / MicrostructureCNN).</strong> Una red MobileNetV2 con una cabeza de siete salidas. Vive en memoria mientras el servidor está encendido. El checkpoint oficial es <code>best_head</code> (90,0 % en prueba, n = 239).</li>
+  </ol>
+  <p>Una cuarta pieza opcional (Supabase) guarda catálogo y estadísticas anónimas. Las fotos del usuario no se almacenan de forma permanente. No hay cuentas ni historial personal.</p>
+
+  <h2>ANEXO B. Extracto breve del modelo</h2>
+  <p>Idea de la arquitectura (no es un volcado completo del repositorio):</p>
+  <pre>MobileNetV2 (ImageNet, sin cabeza) → GlobalAveragePooling
+→ Dropout(0.2) → Dense(7, softmax)  # MicrostructureCNN
+
+# Entrenamiento documentado
+PYTHONPATH=. python -m ml.src.training.train --epochs 12 --fine-tune-epochs 6
+# Selección: best_head (no best_finetune)</pre>
+  <p>Preprocesado compartido: EXIF → RGB → 224×224 Lanczos → <code>mobilenet_v2.preprocess_input</code>.</p>
+
+  <h2>ANEXO C. Manual de usuario de MetalVision AI</h2>
+  <p><strong>C.1 Propósito.</strong> Practicar la identificación de microestructuras de aceros al carbono con apoyo de una CNN. No certifica materiales ni reemplaza al especialista.</p>
+  <p><strong>C.2 Requisitos.</strong> Navegador actualizado y la aplicación en ejecución. No se crea usuario.</p>
+  <p><strong>C.3 Elegir un nivel (tres plataformas independientes).</strong></p>
+  <ol>
+    <li><strong>Básica (verde) — «Aprende a identificar».</strong> Banco dinámico por clase, morfología visual con tarjetas/botones, aumentos 100× / 200× / 500× y post-saberes con imágenes del banco. No llama a la CNN.</li>
+    <li><strong>Principiante (azul/turquesa) — «Identifica y comprueba».</strong> Subir micrografía → preguntas visuales (morfología, clase, rasgos, aumento) por tarjetas → se registra la respuesta → predicción CNN + confianza → comparación usuario vs CNN → explicación breve.</li>
+    <li><strong>Experto (ámbar) — «Predicción CNN».</strong> Modo directo: subir imagen(es) → predicción inmediata (clase, confianza e información complementaria), sin preguntas previas.</li>
+  </ol>
+  <p>La mascota Babi (babilla animada con burbujas de diálogo) acompaña la ruta. Sin autenticación. Misma API de predicción en Principiante y Experto.</p>
+  <p><strong>C.4 Pasos del nivel Experto.</strong></p>
+  <ol>
+    <li>Entrar a Experto. Arrastrar una micrografía o seleccionarla. Formatos: JPG, PNG, WEBP, TIFF; máximo 25 MB por archivo.</li>
+    <li>Comprobar la vista previa y quitar las fotos que no correspondan.</li>
+    <li>Pulsar «Analizar» y esperar el resultado (en lote verá el progreso).</li>
+    <li>Leer la clase, la confianza, las demás barras y la ficha. Comparar con lo que usted ve.</li>
+    <li>Si la confianza es baja o hay dos barras altas, tratar el resultado como duda, no como veredicto.</li>
+  </ol>
+  <p><strong>C.4 Privacidad.</strong> La imagen no se guarda de forma permanente. Si el servidor tiene configurada la base de datos, puede registrarse de forma anónima la clase predicha y las probabilidades, sin su nombre ni el archivo.</p>
+  <p><strong>C.5 Créditos.</strong> Maria Valentina Fajardo Rojas y Juan Pablo Fajardo Sanabria. Director: Carlos Eduardo Rondon Almeyda. Co-directora: Ana Emilse Coy Echeverria. Universidad Industrial de Santander, Escuela de Ingeniería Metalúrgica y Ciencia de Materiales, Bucaramanga, 2026.</p>
+</section>
+</article>
+</body>
+</html>
