@@ -30,9 +30,11 @@ npm-debug.log*
 ml/data/raw/*
 ml/data/processed/*
 ml/data/metadata/*
+ml/data/external/*
 !ml/data/raw/.gitkeep
 !ml/data/processed/.gitkeep
 !ml/data/metadata/.gitkeep
+!ml/data/external/.gitkeep
 ml/models/checkpoints/*
 ml/models/trained/*
 !ml/models/checkpoints/.gitkeep
