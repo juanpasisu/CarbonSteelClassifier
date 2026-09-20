@@ -227,6 +227,23 @@ def train(
         "history_finetune": _history_to_list(fine_history),
         "image_size": list(DATASET_CONFIG.image_size),
         "preprocessing": "mobilenet_v2.preprocess_input",
+        "split": {
+            "train": 1.0 - DATASET_CONFIG.validation_split - DATASET_CONFIG.test_split,
+            "validation": DATASET_CONFIG.validation_split,
+            "test": DATASET_CONFIG.test_split,
+            "strategy": "source_group",
+        },
+        "augmentation": {
+            "mode": "joint",
+            "operations": [
+                "horizontal_and_vertical_flip",
+                "rotation",
+                "zoom",
+                "translation",
+                "brightness",
+                "contrast",
+            ],
+        },
     }
     if fine_history is not None and fine_history.history.get("val_accuracy"):
         training_summary["best_val_accuracy"] = float(

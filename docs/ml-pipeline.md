@@ -51,6 +51,15 @@ PYTHONPATH=. python -m ml.src.training.train --epochs 12 --fine-tune-epochs 6
 
 Incluye class weights, augmentation moderada, EarlyStopping, ModelCheckpoint y fine-tuning parcial.
 
+
+Validación externa (muestras de laboratorio ASTM E3 / ASTM E407, no usadas en entrenamiento):
+
+```bash
+PYTHONPATH=. python -m ml.src.evaluation.external
+```
+
+Colocar las micrografías en `ml/data/external/` con las mismas siete carpetas de clase.
+
 ## Inferencia
 
 FastAPI carga `active.keras` una sola vez y usa el mismo preprocessing.

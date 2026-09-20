@@ -10,9 +10,12 @@ class DatasetConfig:
 
     image_size: tuple[int, int] = (224, 224)
     seed: int = 42
-    validation_split: float = 0.15
-    test_split: float = 0.15
+    # Plan de trabajo: 70 % entrenamiento, 20 % validación, 10 % prueba.
+    # El corte se hace por grupo de origen (no al azar por archivo) para evitar fugas.
+    validation_split: float = 0.20
+    test_split: float = 0.10
     batch_size: int = 32
+    min_images_per_class: int = 200
     supported_extensions: frozenset[str] = frozenset({".jpg", ".jpeg", ".png", ".webp"})
 
 
@@ -33,6 +36,7 @@ class TrainingConfig:
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 DEFAULT_DATASET_DIR = PROJECT_ROOT / "ml" / "data" / "raw"
+DEFAULT_EXTERNAL_DIR = PROJECT_ROOT / "ml" / "data" / "external"
 DEFAULT_CHECKPOINT_DIR = PROJECT_ROOT / "ml" / "models" / "checkpoints"
 DEFAULT_TRAINED_DIR = PROJECT_ROOT / "ml" / "models" / "trained"
 DATASET_CONFIG = DatasetConfig()

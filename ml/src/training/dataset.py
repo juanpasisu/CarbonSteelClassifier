@@ -6,11 +6,12 @@ from collections.abc import Sequence
 
 import numpy as np
 import tensorflow as tf
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 
 from ml.src.config.classes import get_class_registry
 from ml.src.config.settings import DATASET_CONFIG
 from ml.src.data.index import ImageRecord
-from ml.src.preprocessing.image import load_and_preprocess_image
+from ml.src.preprocessing.image import load_and_preprocess_image, load_rgb_image
 
 
 def class_slug_to_index() -> dict[str, int]:
@@ -39,6 +40,41 @@ def records_to_arrays(
     return images, labels
 
 
+def records_to_rgb_arrays(
+    records: Sequence[ImageRecord],
+) -> tuple[np.ndarray, np.ndarray]:
+    """Materialize RGB ``[0, 255]`` images so photometric augmentation is valid."""
+
+    slug_to_index = class_slug_to_index()
+    images = np.stack([load_rgb_image(record.path) for record in records])
+    labels = np.asarray(
+        [slug_to_index[record.class_slug] for record in records],
+        dtype=np.int32,
+    )
+    return images, labels
+
+
+def build_train_augmenter() -> tf.keras.Sequential:
+    """Apply geometric and photometric jitter jointly as one Keras pipeline.
+
+    All operations run together on each training image (not as separate
+    augmentation experiments). Photometric layers keep ``value_range`` in
+    RGB ``[0, 255]`` so they stay valid before ``preprocess_input``.
+    """
+
+    return tf.keras.Sequential(
+        [
+            tf.keras.layers.RandomFlip("horizontal_and_vertical"),
+            tf.keras.layers.RandomRotation(0.08),
+            tf.keras.layers.RandomZoom(0.08),
+            tf.keras.layers.RandomTranslation(0.05, 0.05),
+            tf.keras.layers.RandomBrightness(0.125, value_range=(0.0, 255.0)),
+            tf.keras.layers.RandomContrast(0.15, value_range=(0.0, 255.0)),
+        ],
+        name="joint_train_augmenter",
+    )
+
+
 def build_tf_dataset(
     records: Sequence[ImageRecord],
     *,
@@ -49,7 +85,7 @@ def build_tf_dataset(
 ) -> tf.data.Dataset:
     """Build a ``tf.data.Dataset`` for one partition."""
 
-    images, labels = records_to_arrays(records)
+    images, labels = records_to_rgb_arrays(records)
     dataset = tf.data.Dataset.from_tensor_slices((images, labels))
     if shuffle:
         dataset = dataset.shuffle(
@@ -59,21 +95,17 @@ def build_tf_dataset(
         )
 
     if augment:
-        augmenter = tf.keras.Sequential(
-            [
-                tf.keras.layers.RandomFlip("horizontal_and_vertical"),
-                tf.keras.layers.RandomRotation(0.08),
-                tf.keras.layers.RandomZoom(0.08),
-                tf.keras.layers.RandomTranslation(0.05, 0.05),
-            ],
-            name="train_augmenter",
-        )
+        augmenter = build_train_augmenter()
 
         def _augment(image: tf.Tensor, label: tf.Tensor) -> tuple[tf.Tensor, tf.Tensor]:
             return augmenter(image, training=True), label
 
         dataset = dataset.map(_augment, num_parallel_calls=tf.data.AUTOTUNE)
 
+    def _preprocess(image: tf.Tensor, label: tf.Tensor) -> tuple[tf.Tensor, tf.Tensor]:
+        return preprocess_input(image), label
+
+    dataset = dataset.map(_preprocess, num_parallel_calls=tf.data.AUTOTUNE)
     return dataset.batch(batch_size).prefetch(tf.data.AUTOTUNE)
 
 

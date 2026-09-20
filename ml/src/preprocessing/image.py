@@ -60,14 +60,23 @@ def preprocess_image_bytes(
         raise ValueError("The uploaded file could not be preprocessed") from error
 
 
+def load_rgb_image(
+    image_path: Path,
+    image_size: tuple[int, int] = DATASET_CONFIG.image_size,
+) -> np.ndarray:
+    """Decode an image file to RGB ``[0, 255]`` without MobileNet normalization."""
+
+    with Image.open(image_path) as image:
+        return decode_rgb_image(image, image_size=image_size)
+
+
 def load_and_preprocess_image(
     image_path: Path,
     image_size: tuple[int, int] = DATASET_CONFIG.image_size,
 ) -> np.ndarray:
     """Decode an image file and apply the shared preprocessing pipeline."""
 
-    with Image.open(image_path) as image:
-        return preprocess_pil_image(image, image_size=image_size)
+    return apply_mobilenet_preprocessing(load_rgb_image(image_path, image_size=image_size))
 
 
 def is_readable_image(image_path: Path) -> bool:

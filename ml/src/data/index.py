@@ -54,11 +54,13 @@ def split_by_source_group(
     test_split: float = DATASET_CONFIG.test_split,
     seed: int = DATASET_CONFIG.seed,
 ) -> dict[str, list[ImageRecord]]:
-    """Split records by source group while preserving class representation.
+    """Split records 70/20/10 by source group while preserving class representation.
 
-    All original and augmented variants of one source image stay in exactly one
-    partition. Groups are shuffled independently inside each class to avoid
-    letting the larger classes dominate the split.
+    Fractions follow the original work plan (train/validation/test). All original
+    and augmented variants of one source image stay in exactly one partition so
+    that a random-by-file split cannot leak the same micrograph into two sets.
+    Groups are shuffled independently inside each class to avoid letting the
+    larger classes dominate the split.
     """
 
     if validation_split < 0 or test_split < 0 or validation_split + test_split >= 1:

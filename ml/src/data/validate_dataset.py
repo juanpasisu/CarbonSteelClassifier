@@ -87,9 +87,16 @@ def collect_dataset_report(dataset_dir: Path = DEFAULT_DATASET_DIR) -> dict[str,
             "image_count": image_count,
             "source_group_count": len(class_source_groups),
             "augmented_image_count": augmented_image_count,
+            "meets_plan_minimum": image_count >= DATASET_CONFIG.min_images_per_class,
         }
         total_images += image_count
         total_augmented_images += augmented_image_count
+
+    below_plan_minimum = [
+        slug
+        for slug, report in class_reports.items()
+        if report["image_count"] < DATASET_CONFIG.min_images_per_class
+    ]
 
     return {
         "dataset_dir": str(dataset_dir),
@@ -103,6 +110,8 @@ def collect_dataset_report(dataset_dir: Path = DEFAULT_DATASET_DIR) -> dict[str,
         "ignored_auxiliary_file_count": len(ignored_auxiliary_files),
         "unsupported_file_count": len(unsupported_files),
         "unsupported_files": unsupported_files,
+        "min_images_per_class": DATASET_CONFIG.min_images_per_class,
+        "below_plan_minimum": below_plan_minimum,
         "is_structurally_valid": not missing_classes and total_images > 0,
     }
 

@@ -11,6 +11,7 @@ import numpy as np
 from tensorflow import keras
 
 from ml.src.config.classes import get_class_registry
+from ml.src.config.phase_presence import phase_presence_for_class
 from ml.src.config.settings import DEFAULT_TRAINED_DIR, TRAINING_CONFIG
 from ml.src.preprocessing.image import preprocess_image_bytes
 
@@ -22,6 +23,7 @@ class PredictionResult:
     predicted_class: str
     confidence: float
     probabilities: list[dict[str, float | str]]
+    identified_phases: list[dict[str, str | bool]]
     model_name: str
     model_version: str
     framework: str = "TensorFlow/Keras"
@@ -135,6 +137,7 @@ class MicrostructurePredictor:
             predicted_class=self.class_names[ranked_index],
             confidence=float(probabilities[ranked_index]),
             probabilities=probability_rows,
+            identified_phases=phase_presence_for_class(self.class_names[ranked_index]),
             model_name=self.model_name,
             model_version=self.model_version,
             framework="TensorFlow/Keras",
