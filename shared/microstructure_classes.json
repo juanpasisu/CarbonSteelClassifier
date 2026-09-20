@@ -1,41 +1,41 @@
 {
-  "schema_version": "1.2",
+  "schema_version": "1.3",
   "ordering": "official_training_order",
   "classes": [
     {
       "slug": "austenita",
       "name": "Austenita",
-      "scientific_description": "Fase gamma del hierro, de estructura cristalina cúbica centrada en las caras."
+      "scientific_description": "Es una solución sólida de carbono en hierro con estructura cristalina cúbica centrada en las caras (FCC). Es estable únicamente a altas temperaturas (por encima de 727 °C en aceros al carbono). Es blanda, dúctil, tenaz y no magnética, siendo la fase de partida para la mayoría de los tratamientos térmicos."
     },
     {
       "slug": "ferrita",
       "name": "Ferrita",
-      "scientific_description": "Solución sólida de carbono en hierro alfa, de estructura cristalina cúbica centrada en el cuerpo."
+      "scientific_description": "Es una solución sólida de carbono en hierro α con estructura cúbica centrada en el cuerpo (BCC). Es la fase más estable a temperatura ambiente para aceros de bajo carbono. Es muy blanda, altamente dúctil y magnética, pero tiene baja resistencia mecánica."
     },
     {
       "slug": "perlita",
       "name": "Perlita",
-      "scientific_description": "Microconstituyente laminar formado principalmente por ferrita y cementita."
+      "scientific_description": "No es una fase, sino un constituyente estructural bifásico formado por láminas alternas de ferrita y cementita. Se origina por el enfriamiento lento de la austenita a partir de los 727 °C. Ofrece el mejor equilibrio general entre dureza, resistencia y ductilidad."
     },
     {
       "slug": "cementita-perlita",
       "name": "Cementita + Perlita",
-      "scientific_description": "Microestructura en la que coexisten regiones de cementita y perlita."
+      "scientific_description": "Microestructura típica de aceros hipereutectoides (más de 0.77% de carbono). Al enfriarse lentamente, el exceso de carbono se segrega primero en los bordes de grano de la antigua austenita formando una red o matriz dura de cementita proeutectoide, mientras que el resto de la estructura se transforma en colonias de perlita. Es un material muy duro pero quebradizo."
     },
     {
       "slug": "perlita-ferrita-widmanstatten",
       "name": "Perlita + Ferrita Widmanstätten",
-      "scientific_description": "Microestructura con perlita y ferrita proeutectoide de morfología Widmanstätten."
+      "scientific_description": "Variante morfológica que ocurre en aceros de bajo o medio carbono cuando se enfrían a una velocidad relativamente rápida (pero sin llegar al temple) o desde una temperatura de austenización excesivamente alta (grano grueso). En lugar de granos redondeados, la ferrita proeutectoide crece en forma de agujas o placas delgadas orientadas en direcciones cristalográficas específicas dentro de la matriz de perlita. Esta disposición geométrica reduce drásticamente la tenacidad del acero, haciéndolo propenso a fracturas."
     },
     {
       "slug": "perlita-ferrita-equiaxial",
       "name": "Perlita + Ferrita Equiaxial",
-      "scientific_description": "Microestructura con colonias de perlita y ferrita de granos aproximadamente equiaxiales."
+      "scientific_description": "Estructura que se genera en aceros hipoeutectoides (menos de 0.77% de carbono) tras un enfriamiento lento y controlado (como un recocido ordinario). Antes de formarse la perlita, se precipitan granos de ferrita proeutectoide con forma esférica u homogénea (equiaxiales) en los bordes de grano. Es una estructura muy común, fácil de mecanizar y con buena tenacidad."
     },
     {
       "slug": "martensita",
       "name": "Martensita",
-      "scientific_description": "Fase metaestable formada por transformación displaciva de la austenita, generalmente de alta dureza."
+      "scientific_description": "Es una fase monofásica que se produce mediante el enfriamiento extremadamente rápido (temple) de la austenita, impidiendo que el carbono difunda. Tiene una estructura tetragonal centrada en el cuerpo (BCT) altamente distorsionada. Es la estructura más dura y frágil del acero, con nula ductilidad antes de ser revenida."
     }
   ]
 }
