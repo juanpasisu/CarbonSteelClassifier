@@ -1,0 +1,33 @@
+---
+description: When the user asks to train/retrain the Keras model, retrain from ml/data/raw
+alwaysApply: true
+---
+
+# Retrain Keras model
+
+When the user says anything like **“entrena el modelo”**, **“reentrena Keras”**, **“entrena el modelo keras”**, or equivalent:
+
+1. **Do not** invent a new dataset path, download images, or require Supabase Storage for training.
+2. **Retrain** using **all** images under the established local dataset:
+
+```text
+ml/data/raw/
+├── austenita/
+├── ferrita/
+├── perlita/
+├── cementita-perlita/
+├── perlita-ferrita-widmanstatten/
+├── perlita-ferrita-equiaxial/
+└── martensita/
+```
+
+3. Run from the **repo root** with the Python 3.11 `.venv`:
+
+```bash
+source .venv/bin/activate
+PYTHONPATH=. python -m ml.src.training.train --epochs 12 --fine-tune-epochs 6
+```
+
+4. Confirm the artifact is written to `ml/models/trained/active.keras` (plus `labels.json` / `class_names.json` / `metrics.json`).
+5. Optionally register the new version in Supabase with `scripts/register_active_model.py` and remind to restart the backend so it loads the new weights.
+6. Keep class order and preprocessing aligned with `shared/microstructure_classes.json` and `mobilenet_v2.preprocess_input`. Do not simulate metrics or predictions.
