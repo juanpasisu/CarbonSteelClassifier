@@ -8,6 +8,7 @@ from ml.src.preprocessing.image import preprocess_image_bytes
 
 from .file_validation import (
     InvalidImageError,
+    resolve_image_content_type,
     validate_image_content,
     validate_image_upload,
 )
@@ -25,8 +26,9 @@ def prepare_image_for_inference(
     """
 
     try:
+        content_type = resolve_image_content_type(filename, content_type, content)
         validate_image_upload(filename, content_type, len(content))
-        validate_image_content(content, content_type or "")
+        validate_image_content(content, content_type)
         return preprocess_image_bytes(content)
     except InvalidImageError:
         raise

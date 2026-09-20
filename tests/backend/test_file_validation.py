@@ -35,6 +35,24 @@ def test_prepare_image_returns_canonical_tensor_shape() -> None:
     assert -1.0 <= float(tensor.min()) <= float(tensor.max()) <= 1.0
 
 
+def test_accepts_generic_binary_mime_when_extension_and_bytes_match() -> None:
+    tensor = prepare_image_for_inference(
+        filename="micrograph.png",
+        content_type="application/octet-stream",
+        content=VALID_PNG,
+    )
+    assert tensor.shape == (224, 224, 3)
+
+
+def test_accepts_missing_mime_when_png_magic_bytes_match() -> None:
+    tensor = prepare_image_for_inference(
+        filename="micrograph.png",
+        content_type=None,
+        content=VALID_PNG,
+    )
+    assert tensor.shape == (224, 224, 3)
+
+
 def test_rejects_fake_image_content() -> None:
     with pytest.raises(InvalidImageError):
         validate_image_content(b"not-an-image", "image/png")
