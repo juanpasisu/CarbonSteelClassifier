@@ -56,3 +56,5 @@ uploads/
 .DS_Store
 Thumbs.db
 *.swp
+
+.playwright-mcp/
