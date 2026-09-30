@@ -5,11 +5,7 @@
     "/samples/bank/austenita/03.jpg",
     "/samples/bank/austenita/04.jpg",
     "/samples/bank/austenita/05.jpg",
-    "/samples/bank/austenita/06.jpg",
-    "/samples/bank/austenita/07.jpg",
-    "/samples/bank/austenita/08.jpg",
-    "/samples/bank/austenita/09.jpg",
-    "/samples/bank/austenita/10.jpg"
+    "/samples/bank/austenita/06.jpg"
   ],
   "cementita-perlita": [
     "/samples/bank/cementita-perlita/01.jpg",
@@ -17,11 +13,7 @@
     "/samples/bank/cementita-perlita/03.jpg",
     "/samples/bank/cementita-perlita/04.jpg",
     "/samples/bank/cementita-perlita/05.jpg",
-    "/samples/bank/cementita-perlita/06.jpg",
-    "/samples/bank/cementita-perlita/07.jpg",
-    "/samples/bank/cementita-perlita/08.jpg",
-    "/samples/bank/cementita-perlita/09.jpg",
-    "/samples/bank/cementita-perlita/10.jpg"
+    "/samples/bank/cementita-perlita/06.jpg"
   ],
   "ferrita": [
     "/samples/bank/ferrita/01.jpg",
@@ -29,23 +21,14 @@
     "/samples/bank/ferrita/03.jpg",
     "/samples/bank/ferrita/04.jpg",
     "/samples/bank/ferrita/05.jpg",
-    "/samples/bank/ferrita/06.jpg",
-    "/samples/bank/ferrita/07.jpg",
-    "/samples/bank/ferrita/08.jpg",
-    "/samples/bank/ferrita/09.jpg",
-    "/samples/bank/ferrita/10.jpg"
+    "/samples/bank/ferrita/06.jpg"
   ],
   "martensita": [
     "/samples/bank/martensita/01.jpg",
     "/samples/bank/martensita/02.jpg",
     "/samples/bank/martensita/03.jpg",
     "/samples/bank/martensita/04.jpg",
-    "/samples/bank/martensita/05.jpg",
-    "/samples/bank/martensita/06.jpg",
-    "/samples/bank/martensita/07.jpg",
-    "/samples/bank/martensita/08.jpg",
-    "/samples/bank/martensita/09.jpg",
-    "/samples/bank/martensita/10.jpg"
+    "/samples/bank/martensita/05.jpg"
   ],
   "perlita": [
     "/samples/bank/perlita/01.jpg",
@@ -53,11 +36,7 @@
     "/samples/bank/perlita/03.jpg",
     "/samples/bank/perlita/04.jpg",
     "/samples/bank/perlita/05.jpg",
-    "/samples/bank/perlita/06.jpg",
-    "/samples/bank/perlita/07.jpg",
-    "/samples/bank/perlita/08.jpg",
-    "/samples/bank/perlita/09.jpg",
-    "/samples/bank/perlita/10.jpg"
+    "/samples/bank/perlita/06.jpg"
   ],
   "perlita-ferrita-equiaxial": [
     "/samples/bank/perlita-ferrita-equiaxial/01.jpg",
@@ -65,11 +44,7 @@
     "/samples/bank/perlita-ferrita-equiaxial/03.jpg",
     "/samples/bank/perlita-ferrita-equiaxial/04.jpg",
     "/samples/bank/perlita-ferrita-equiaxial/05.jpg",
-    "/samples/bank/perlita-ferrita-equiaxial/06.jpg",
-    "/samples/bank/perlita-ferrita-equiaxial/07.jpg",
-    "/samples/bank/perlita-ferrita-equiaxial/08.jpg",
-    "/samples/bank/perlita-ferrita-equiaxial/09.jpg",
-    "/samples/bank/perlita-ferrita-equiaxial/10.jpg"
+    "/samples/bank/perlita-ferrita-equiaxial/06.jpg"
   ],
   "perlita-ferrita-widmanstatten": [
     "/samples/bank/perlita-ferrita-widmanstatten/01.jpg",
@@ -77,10 +52,6 @@
     "/samples/bank/perlita-ferrita-widmanstatten/03.jpg",
     "/samples/bank/perlita-ferrita-widmanstatten/04.jpg",
     "/samples/bank/perlita-ferrita-widmanstatten/05.jpg",
-    "/samples/bank/perlita-ferrita-widmanstatten/06.jpg",
-    "/samples/bank/perlita-ferrita-widmanstatten/07.jpg",
-    "/samples/bank/perlita-ferrita-widmanstatten/08.jpg",
-    "/samples/bank/perlita-ferrita-widmanstatten/09.jpg",
-    "/samples/bank/perlita-ferrita-widmanstatten/10.jpg"
+    "/samples/bank/perlita-ferrita-widmanstatten/06.jpg"
   ]
 }

@@ -18,20 +18,11 @@ export const SAMPLE_BANK: SampleBank = sampleBank as SampleBank
 
 export function bankForSlug(slug: string): string[] {
   const bank = SAMPLE_BANK[slug] ?? []
+  if (bank.length > 0) {
+    return [...bank]
+  }
   const featured = CLASS_SAMPLE_SRC[slug]
-  const merged: string[] = []
-  if (featured) {
-    merged.push(featured)
-  }
-  for (const src of bank) {
-    if (!merged.includes(src)) {
-      merged.push(src)
-    }
-  }
-  if (merged.length === 0) {
-    return ['/samples/demo-perlita.png']
-  }
-  return merged
+  return [featured ?? '/samples/demo-perlita.png']
 }
 
 export function randomBankImage(slug: string, exclude?: string): string {
