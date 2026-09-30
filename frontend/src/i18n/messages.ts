@@ -366,7 +366,7 @@ const es: Dictionary = {
   'how.s1.title': 'Aprende',
   'how.s1.desc':
     'Estudia morfología y aumentos con el banco de micrografías en el nivel Básica.',
-  'how.s2.title': 'Practica',
+  'how.s2.title': 'Práctica',
   'how.s2.desc':
     'En Principiante respondes primero y luego contrastas tu criterio con la CNN.',
   'how.s3.title': 'Predice',
