@@ -23,8 +23,8 @@ export function MicrographFrame({
 
   return (
     <div
-      className={`overflow-hidden rounded-2xl border ${className}`}
-      style={{ borderColor: 'var(--mv-border)', background: '#0b1f17' }}
+      className={`mv-micrograph overflow-hidden rounded-2xl border ${className}`}
+      style={{ borderColor: 'var(--mv-border)', background: 'var(--mv-micro-frame)' }}
     >
       <div className="relative aspect-square w-full overflow-hidden">
         <img
@@ -34,6 +34,7 @@ export function MicrographFrame({
           loading="lazy"
           src={src}
           style={{
+            filter: 'none',
             transform: zoom === 1 ? undefined : `scale(${zoom})`,
             transformOrigin: 'center center',
           }}
@@ -68,8 +69,8 @@ export function MicrographThumb({
   const border = active && accent ? accent : 'var(--mv-border)'
   const content = (
     <span
-      className="block aspect-square w-full overflow-hidden rounded-md border"
-      style={{ borderColor: border, background: '#0b1f17' }}
+      className="mv-micrograph block aspect-square w-full overflow-hidden rounded-md border"
+      style={{ borderColor: border, background: 'var(--mv-micro-frame)' }}
     >
       <img
         alt={alt}
@@ -77,6 +78,7 @@ export function MicrographThumb({
         decoding="async"
         loading="lazy"
         src={src}
+        style={{ filter: 'none' }}
       />
     </span>
   )

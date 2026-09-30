@@ -10,7 +10,6 @@ import {
   buildIdentificationQuiz,
   learningForSlug,
   localizeCue,
-  sampleSrcForSlug,
   type QuizQuestion,
 } from '../../lib/learningContent'
 import { bankForSlug, randomBankImage } from '../../lib/sampleImages'
@@ -354,13 +353,17 @@ export function BasicLevel({ onBack }: BasicLevelProps) {
               >
                 {t('basic.quizPrompt')}
               </h3>
-              <img
-                alt=""
-                className="mt-4 aspect-square w-full rounded-xl object-contain"
-                decoding="async"
-                src={quiz[quizIndex].imageSrc}
-                style={{ background: '#0b1f17' }}
-              />
+              <div
+                className="mt-4 flex justify-center overflow-hidden rounded-xl"
+                style={{ background: 'var(--mv-micro-frame)' }}
+              >
+                <img
+                  alt=""
+                  className="block h-auto max-h-[min(50vh,28rem)] w-auto max-w-full object-contain"
+                  decoding="async"
+                  src={quiz[quizIndex].imageSrc}
+                />
+              </div>
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 {quiz[quizIndex].options.map((optionSlug) => {
                   const picked = lastPick === optionSlug
@@ -387,17 +390,6 @@ export function BasicLevel({ onBack }: BasicLevelProps) {
                       style={{ borderColor: border, background, color }}
                       type="button"
                     >
-                      <span
-                        className="mb-3 block aspect-square w-full overflow-hidden rounded-md"
-                        style={{ background: '#0b1f17' }}
-                      >
-                        <img
-                          alt=""
-                          className="h-full w-full object-contain"
-                          decoding="async"
-                          src={sampleSrcForSlug(optionSlug)}
-                        />
-                      </span>
                       {localizedName(optionSlug)}
                     </button>
                   )

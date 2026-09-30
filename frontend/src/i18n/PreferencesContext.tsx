@@ -45,9 +45,8 @@ function readStoredTheme(): Theme {
   if (value === 'dark' || value === 'light') {
     return value
   }
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'light'
+  // Dark is the primary academic aesthetic for MetalVision AI.
+  return 'dark'
 }
 
 function applyDocumentPreferences(locale: Locale, theme: Theme) {

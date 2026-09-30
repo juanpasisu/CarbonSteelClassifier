@@ -16,7 +16,6 @@ import {
   MORPHOLOGY_OPTIONS,
   VISUAL_TRAIT_OPTIONS,
   learningForSlug,
-  sampleSrcForSlug,
   slugFromClassName,
 } from '../../lib/learningContent'
 import {
@@ -219,42 +218,18 @@ export function BeginnerLevel({ classes, onBack }: BeginnerLevelProps) {
             {questionIndex === 1 && (
               <QuestionBlock color={tokens.accent} title={t('beginner.q.class')}>
                 <div className="grid gap-3 sm:grid-cols-2">
-                  {LOCALIZED_CLASSES.map((item) => {
-                    const active = answers.classSlug === item.slug
-                    return (
-                      <button
-                        className="overflow-hidden rounded-xl border text-left transition hover:-translate-y-0.5"
-                        key={item.slug}
-                        onClick={() => {
-                          setAnswers((prev) => ({ ...prev, classSlug: item.slug }))
-                          setQuestionIndex(2)
-                        }}
-                        style={{
-                          borderColor: active ? tokens.accent : 'var(--mv-border)',
-                          background: active ? tokens.softStrong : 'var(--mv-bg)',
-                        }}
-                        type="button"
-                      >
-                        <span
-                          className="block aspect-square w-full overflow-hidden"
-                          style={{ background: '#0b1f17' }}
-                        >
-                          <img
-                            alt=""
-                            className="h-full w-full object-contain"
-                            decoding="async"
-                            src={sampleSrcForSlug(item.slug)}
-                          />
-                        </span>
-                        <span
-                          className="block px-3 py-2 text-sm font-semibold"
-                          style={{ color: tokens.ink }}
-                        >
-                          {className(item.nameEs)}
-                        </span>
-                      </button>
-                    )
-                  })}
+                  {LOCALIZED_CLASSES.map((item) => (
+                    <ChoiceCard
+                      active={answers.classSlug === item.slug}
+                      key={item.slug}
+                      label={className(item.nameEs)}
+                      onClick={() => {
+                        setAnswers((prev) => ({ ...prev, classSlug: item.slug }))
+                        setQuestionIndex(2)
+                      }}
+                      tokens={tokens}
+                    />
+                  ))}
                 </div>
               </QuestionBlock>
             )}

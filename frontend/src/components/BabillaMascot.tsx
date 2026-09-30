@@ -32,10 +32,10 @@ export function BabillaMascot({
         <p
           className="rounded-2xl px-3 py-2.5 text-xs leading-5 sm:px-4 sm:py-3 sm:text-sm"
           style={{
-            background: 'var(--mv-surface)',
+            background: 'var(--mv-bubble-bg)',
             color: 'var(--mv-text)',
-            border: '1px solid var(--mv-border)',
-            boxShadow: '0 8px 24px rgba(15, 61, 42, 0.08)',
+            border: '1px solid var(--mv-bubble-border)',
+            boxShadow: 'var(--mv-card-shadow)',
           }}
         >
           {t(speechKey)}
@@ -46,8 +46,10 @@ export function BabillaMascot({
       >
         <img
           alt={t('mascot.alt')}
-          className="h-full w-full bg-transparent object-contain"
-          src="/branding/babilla-mascot-v3.png?v=13"
+          className="h-full w-full object-contain"
+          decoding="async"
+          src="/branding/babi-mascot-clean.png?v=10"
+          style={{ backgroundColor: 'transparent', background: 'none' }}
         />
       </div>
     </div>

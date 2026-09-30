@@ -5,6 +5,7 @@ export type MessageKey =
   | 'nav.home'
   | 'nav.analyze'
   | 'nav.levels'
+  | 'nav.classifier'
   | 'nav.howItWorks'
   | 'nav.microstructures'
   | 'nav.about'
@@ -118,32 +119,50 @@ export type MessageKey =
   | 'footer.quoteAuthor'
   | 'footer.location'
   | 'footer.credit'
+  | 'footer.strip.school'
+  | 'footer.strip.bridge'
+  | 'footer.strip.slogan'
   | 'theme.toDark'
   | 'theme.toLight'
   | 'lang.toEnglish'
   | 'lang.toSpanish'
   | 'logo.alt'
   | 'levels.kicker'
-  | 'levels.title'
+  | 'levels.titleLead'
+  | 'levels.titleAccent'
+  | 'levels.titleTrail'
   | 'levels.subtitle'
   | 'levels.progress'
   | 'levels.step'
   | 'levels.back'
+  | 'levels.handwritten'
+  | 'levels.indicator1'
+  | 'levels.indicator2'
+  | 'levels.indicator3'
+  | 'levels.basic.label'
+  | 'levels.basic.stage'
   | 'levels.basic.badge'
   | 'levels.basic.title'
   | 'levels.basic.subtitle'
   | 'levels.basic.points'
   | 'levels.basic.cta'
+  | 'levels.basic.imageName'
+  | 'levels.beginner.label'
+  | 'levels.beginner.stage'
   | 'levels.beginner.badge'
   | 'levels.beginner.title'
   | 'levels.beginner.subtitle'
   | 'levels.beginner.points'
   | 'levels.beginner.cta'
+  | 'levels.beginner.imageName'
+  | 'levels.expert.label'
+  | 'levels.expert.stage'
   | 'levels.expert.badge'
   | 'levels.expert.title'
   | 'levels.expert.subtitle'
   | 'levels.expert.points'
   | 'levels.expert.cta'
+  | 'levels.expert.imageName'
   | 'basic.hint'
   | 'basic.tabLearn'
   | 'basic.tabQuiz'
@@ -195,6 +214,7 @@ const es: Dictionary = {
   'nav.home': 'Inicio',
   'nav.analyze': 'Analizar',
   'nav.levels': 'Niveles',
+  'nav.classifier': 'Clasificador',
   'nav.howItWorks': '¿Cómo funciona?',
   'nav.microstructures': 'Microestructuras',
   'nav.about': 'Sobre el proyecto',
@@ -226,33 +246,47 @@ const es: Dictionary = {
   'hero.headerDegree': 'Proyecto de grado · Ingeniería Metalúrgica',
   'logo.uisAlt': 'Logo Universidad Industrial de Santander',
   'levels.kicker': 'Ruta de aprendizaje',
-  'levels.title': 'Elige tu nivel y empieza',
+  'levels.titleLead': '¿Cómo quieres ',
+  'levels.titleAccent': 'aprender',
+  'levels.titleTrail': '?',
   'levels.subtitle':
-    'Tres plataformas grandes: aprende morfología, practica tu criterio o pide la predicción directa de la CNN.',
+    'Aprende a reconocer microestructuras de aceros al carbono mediante tres niveles de aprendizaje, desde la observación hasta la clasificación con IA.',
   'levels.progress': 'Progresión sugerida: Básica → Principiante → Experto',
   'levels.step': 'Nivel {n}',
   'levels.back': 'Volver a niveles',
+  'levels.handwritten': 'La metalurgia también se aprende viéndola.',
+  'levels.indicator1': 'Contenido basado en metalurgia real',
+  'levels.indicator2': 'Aprendizaje progresivo',
+  'levels.indicator3': 'Apoyo con inteligencia artificial',
+  'levels.basic.label': 'Nivel básica',
+  'levels.basic.stage': 'Introductorio',
   'levels.basic.badge': 'Básica',
-  'levels.basic.title': 'Aprende a identificar',
-  'levels.basic.subtitle':
-    'Explora el banco de micrografías, la morfología característica y el efecto del aumento.',
+  'levels.basic.title': 'Explora',
+  'levels.basic.subtitle': 'Conoce y reconoce las microestructuras.',
   'levels.basic.points':
-    'Tarjetas visuales por microestructura|Comparación interactiva de aumentos|Post-saberes con imágenes reales',
-  'levels.basic.cta': 'Entrar a Básica',
+    'Banco de micrografías|Morfología y características|Diferentes aumentos|Post-saberes y ejemplos reales',
+  'levels.basic.cta': 'Comenzar aprendizaje →',
+  'levels.basic.imageName': 'Ferrita + Perlita',
+  'levels.beginner.label': 'Nivel principiante',
+  'levels.beginner.stage': 'Intermedio',
   'levels.beginner.badge': 'Principiante',
-  'levels.beginner.title': 'Identifica y comprueba',
+  'levels.beginner.title': 'Analiza',
   'levels.beginner.subtitle':
-    'Sube una micrografía, responde preguntas visuales y luego compara tu criterio con la CNN.',
+    'Pon a prueba tu criterio antes de consultar a la IA.',
   'levels.beginner.points':
-    'Preguntas por tarjetas y selección|Registro de tu respuesta|Comparación con la predicción CNN',
-  'levels.beginner.cta': 'Entrar a Principiante',
+    'Preguntas por tarjetas|Tu respuesta y retroalimentación|Comparación con la predicción de la CNN|Registro de progreso',
+  'levels.beginner.cta': 'Poner a prueba →',
+  'levels.beginner.imageName': 'Perlita',
+  'levels.expert.label': 'Nivel experto',
+  'levels.expert.stage': 'Avanzado',
   'levels.expert.badge': 'Experto',
-  'levels.expert.title': 'Predicción CNN',
+  'levels.expert.title': 'Predice con IA',
   'levels.expert.subtitle':
-    'Modo directo: carga una o varias imágenes y obtén clase, confianza e información complementaria.',
+    'Carga tus imágenes y obtén la clasificación de la CNN.',
   'levels.expert.points':
-    'Sin preguntas previas|Análisis individual o por lote|Resultados listos para revisión',
-  'levels.expert.cta': 'Entrar a Experto',
+    'Carga una o varias imágenes|Clasificación CNN|Confianza y análisis de resultados|Descarga de reporte',
+  'levels.expert.cta': 'Analizar con IA →',
+  'levels.expert.imageName': 'Austenita',
   'basic.hint':
     'Estudia cada microestructura con ejemplos visuales y comprueba lo aprendido con un breve post-saberes.',
   'basic.tabLearn': 'Aprender',
@@ -295,9 +329,9 @@ const es: Dictionary = {
   'basic.nextQuestion': 'Siguiente',
   'basic.seeScore': 'Ver puntaje',
   'basic.streak': 'Racha ×{n}',
-  'mascot.alt': 'Babilla, mascota de MetalVision AI',
+  'mascot.alt': 'Babi, mascota educativa de MetalVision AI',
   'mascot.welcome':
-    '¡Hola! Soy Babi. Elige un nivel y aprendamos a leer microestructuras juntos.',
+    '¡Hola! Soy Babi.\nTe acompaño en tu ruta de aprendizaje.',
   'mascot.learn': 'Mira varias fotos de la misma clase: el patrón se repite.',
   'mascot.quiz': '¡A jugar! Elige la microestructura correcta.',
   'mascot.correct': '¡Bien! Esa morfología encaja.',
@@ -414,6 +448,11 @@ const es: Dictionary = {
   'footer.location': 'Bucaramanga, Colombia',
   'footer.credit':
     'MetalVision AI · Proyecto de grado · Ingeniería Metalúrgica · UIS',
+  'footer.strip.school':
+    'Una herramienta didáctica para estudiantes de la Escuela de Ingeniería Metalúrgica y Ciencia de Materiales de la UIS.',
+  'footer.strip.bridge':
+    'Conecta la metalurgia tradicional con las nuevas tecnologías.',
+  'footer.strip.slogan': 'Aprender hoy, transformar mañana.',
   'theme.toDark': 'Activar modo nocturno',
   'theme.toLight': 'Activar modo claro',
   'lang.toEnglish': 'Switch to English',
@@ -426,6 +465,7 @@ const en: Dictionary = {
   'nav.home': 'Home',
   'nav.analyze': 'Analyze',
   'nav.levels': 'Levels',
+  'nav.classifier': 'Classifier',
   'nav.howItWorks': 'How it works',
   'nav.microstructures': 'Microstructures',
   'nav.about': 'About the project',
@@ -456,33 +496,47 @@ const en: Dictionary = {
   'hero.headerDegree': 'Degree project · Metallurgical Engineering',
   'logo.uisAlt': 'Universidad Industrial de Santander logo',
   'levels.kicker': 'Learning path',
-  'levels.title': 'Choose your level and start',
+  'levels.titleLead': 'How do you want to ',
+  'levels.titleAccent': 'learn',
+  'levels.titleTrail': '?',
   'levels.subtitle':
-    'Three big platforms: learn morphology, practice your judgment, or request a direct CNN prediction.',
+    'Learn to recognize carbon-steel microstructures through three learning levels, from observation to AI classification.',
   'levels.progress': 'Suggested path: Basic → Beginner → Expert',
   'levels.step': 'Level {n}',
   'levels.back': 'Back to levels',
+  'levels.handwritten': 'Metallurgy is also learned by seeing it.',
+  'levels.indicator1': 'Content grounded in real metallurgy',
+  'levels.indicator2': 'Progressive learning',
+  'levels.indicator3': 'Support from artificial intelligence',
+  'levels.basic.label': 'Basic level',
+  'levels.basic.stage': 'Introductory',
   'levels.basic.badge': 'Basic',
-  'levels.basic.title': 'Learn to identify',
-  'levels.basic.subtitle':
-    'Explore the micrograph bank, characteristic morphology, and how magnification changes identification.',
+  'levels.basic.title': 'Explore',
+  'levels.basic.subtitle': 'Learn and recognize the microstructures.',
   'levels.basic.points':
-    'Visual cards per microstructure|Interactive magnification comparison|Post-check with real images',
-  'levels.basic.cta': 'Enter Basic',
+    'Micrograph bank|Morphology and traits|Different magnifications|Post-check with real examples',
+  'levels.basic.cta': 'Start learning →',
+  'levels.basic.imageName': 'Ferrite + Pearlite',
+  'levels.beginner.label': 'Beginner level',
+  'levels.beginner.stage': 'Intermediate',
   'levels.beginner.badge': 'Beginner',
-  'levels.beginner.title': 'Identify and check',
+  'levels.beginner.title': 'Analyze',
   'levels.beginner.subtitle':
-    'Upload a micrograph, answer visual questions, then compare your judgment with the CNN.',
+    'Test your judgment before consulting the AI.',
   'levels.beginner.points':
-    'Card and multiple-choice questions|Your answers are recorded|Side-by-side CNN comparison',
-  'levels.beginner.cta': 'Enter Beginner',
+    'Card-based questions|Your answer and feedback|Comparison with the CNN prediction|Progress tracking',
+  'levels.beginner.cta': 'Take the challenge →',
+  'levels.beginner.imageName': 'Pearlite',
+  'levels.expert.label': 'Expert level',
+  'levels.expert.stage': 'Advanced',
   'levels.expert.badge': 'Expert',
-  'levels.expert.title': 'CNN prediction',
+  'levels.expert.title': 'Predict with AI',
   'levels.expert.subtitle':
-    'Direct mode: upload one or more images and get class, confidence, and complementary details.',
+    'Upload your images and get the CNN classification.',
   'levels.expert.points':
-    'No prior questions|Single or batch analysis|Results ready for review',
-  'levels.expert.cta': 'Enter Expert',
+    'Upload one or many images|CNN classification|Confidence and result analysis|Download a report',
+  'levels.expert.cta': 'Analyze with AI →',
+  'levels.expert.imageName': 'Austenite',
   'basic.hint':
     'Study each microstructure with visual examples and check what you learned in a short post-quiz.',
   'basic.tabLearn': 'Learn',
@@ -525,9 +579,9 @@ const en: Dictionary = {
   'basic.nextQuestion': 'Next',
   'basic.seeScore': 'See score',
   'basic.streak': 'Streak ×{n}',
-  'mascot.alt': 'Babilla, MetalVision AI mascot',
+  'mascot.alt': 'Babi, MetalVision AI educational mascot',
   'mascot.welcome':
-    'Hi! I’m Babi. Pick a level and let’s learn to read microstructures together.',
+    'Hi! I am Babi.\nI will walk with you on your learning path.',
   'mascot.learn': 'Browse several photos of the same class—the pattern repeats.',
   'mascot.quiz': 'Let’s play! Pick the correct microstructure.',
   'mascot.correct': 'Nice! That morphology fits.',
@@ -643,6 +697,11 @@ const en: Dictionary = {
   'footer.location': 'Bucaramanga, Colombia',
   'footer.credit':
     'MetalVision AI · Degree project · Metallurgical Engineering · UIS',
+  'footer.strip.school':
+    'A didactic tool for students of the School of Metallurgical Engineering and Materials Science at UIS.',
+  'footer.strip.bridge':
+    'Connecting traditional metallurgy with new technologies.',
+  'footer.strip.slogan': 'Learn today, transform tomorrow.',
   'theme.toDark': 'Enable dark mode',
   'theme.toLight': 'Enable light mode',
   'lang.toEnglish': 'Switch to English',

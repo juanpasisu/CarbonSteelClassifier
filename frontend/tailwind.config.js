@@ -11,6 +11,8 @@ export default {
       },
       fontFamily: {
         sans: ['"Source Sans 3"', 'Segoe UI', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['"Times New Roman"', 'Times', 'Georgia', 'serif'],
+        serif: ['"Times New Roman"', 'Times', 'Georgia', 'serif'],
       },
     },
   },

@@ -13,9 +13,9 @@
         try {
           const theme = localStorage.getItem('metalvision.theme');
           const locale = localStorage.getItem('metalvision.locale');
-          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-          const resolved = theme === 'light' || theme === 'dark' ? theme : prefersDark ? 'dark' : 'light';
-          if (resolved === 'dark') document.documentElement.classList.add('dark');
+          const resolved = theme === 'light' || theme === 'dark' ? theme : 'dark';
+          document.documentElement.classList.toggle('dark', resolved === 'dark');
+          document.documentElement.dataset.theme = resolved;
           document.documentElement.lang = locale === 'en' ? 'en' : 'es';
         } catch (_) {}
       })();
