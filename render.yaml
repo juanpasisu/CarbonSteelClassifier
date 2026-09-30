@@ -1,0 +1,42 @@
+# Render Blueprint: one Web Service (API + SPA + CNN).
+# Dashboard → New → Blueprint → connect this repo.
+# Set secret env vars in the Render UI (especially MODEL_URL).
+
+services:
+  - type: web
+    name: metalvision-ai
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    # Free = 512 MB RAM; TensorFlow may OOM. Switch to starter if it does.
+    envVars:
+      - key: PYTHONPATH
+        value: /app
+      - key: MODEL_PATH
+        value: /app/ml/models/trained/active.keras
+      - key: FRONTEND_DIST
+        value: /app/frontend/dist
+      - key: ENABLE_PREDICTION_LOGGING
+        value: "true"
+      - key: TF_CPP_MIN_LOG_LEVEL
+        value: "2"
+      - key: OMP_NUM_THREADS
+        value: "1"
+      - key: TF_NUM_INTEROP_THREADS
+        value: "1"
+      - key: TF_NUM_INTRAOP_THREADS
+        value: "1"
+      # Public HTTPS URL to active.keras (GitHub Release, Supabase Storage, etc.).
+      - key: MODEL_URL
+        sync: false
+      # Include your Render URL once known, e.g. https://metalvision-ai.onrender.com
+      - key: CORS_ORIGINS
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false

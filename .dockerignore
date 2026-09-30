@@ -1,0 +1,49 @@
+# Git / IDE
+.git
+.github
+.cursor
+.vscode
+.idea
+**/.DS_Store
+
+# Local env and secrets
+.env
+.env.*
+!.env.example
+backend/.env
+frontend/.env
+**/*.orig
+
+# Python
+.venv
+**/.venv
+**/__pycache__
+**/*.py[cod]
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.htmlcov
+.coverage
+.uv-cache
+.tmp
+.venv-py314-backup
+
+# Node
+**/node_modules
+frontend/dist
+npm-debug.log*
+
+# Heavy local data (not needed at runtime)
+ml/data/raw
+ml/data/processed
+ml/data/metadata
+ml/data/external
+ml/models/checkpoints
+ml/models/archive
+uploads
+
+# Docs / thesis export (not required in the runtime image)
+docs/tesis
+
+# Tests stay available for CI images if needed; exclude from default context size
+# (runtime image does not copy tests/)

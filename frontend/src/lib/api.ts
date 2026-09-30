@@ -1,9 +1,20 @@
 import type { Locale, MessageKey } from '../i18n/messages'
 import { translate } from '../i18n/messages'
 
-const apiBaseUrl = (
-  import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'
-).replace(/\/+$/, '')
+/** Resolve API base URL. Empty string means same-origin (Docker / Render). */
+export function resolveApiBaseUrl(
+  configured: string | undefined = import.meta.env.VITE_API_BASE_URL,
+): string {
+  if (configured === '') {
+    return ''
+  }
+  if (configured == null) {
+    return 'http://127.0.0.1:8000'
+  }
+  return configured.replace(/\/+$/, '')
+}
+
+const apiBaseUrl = resolveApiBaseUrl()
 
 export interface MicrostructureClass {
   slug: string
