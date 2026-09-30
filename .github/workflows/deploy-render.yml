@@ -21,6 +21,7 @@ jobs:
     env:
       PYTHONPATH: ${{ github.workspace }}
       TF_CPP_MIN_LOG_LEVEL: "2"
+      MODEL_URL: https://github.com/juanpasisu/CarbonSteelClassifier/releases/download/model-v1/active.keras
     steps:
       - uses: actions/checkout@v4
 
@@ -36,6 +37,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt -r ml/requirements.txt
+
+      - name: Download CNN weights
+        run: |
+          mkdir -p ml/models/trained
+          curl -fsSL --retry 3 "$MODEL_URL" -o ml/models/trained/active.keras
 
       - name: Run pytest
         run: pytest -q
