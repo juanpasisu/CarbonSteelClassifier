@@ -25,8 +25,6 @@ class TrainingConfig:
 
     epochs: int = 20
     learning_rate: float = 1e-3
-    fine_tune_learning_rate: float = 1e-4
-    fine_tune_epochs: int = 8
     weight_decay: float = 1e-4
     early_stopping_patience: int = 5
     num_workers: int = 0

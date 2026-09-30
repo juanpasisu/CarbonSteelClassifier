@@ -41,24 +41,6 @@ def build_mobilenet_v2_classifier(
     return model
 
 
-def unfreeze_top_layers(model: keras.Model, *, layers_to_unfreeze: int = 40) -> None:
-    """Unfreeze the last convolutional blocks for fine-tuning."""
-
-    base_model = getattr(model, "base_model", None)
-    if base_model is None:
-        for layer in model.layers:
-            if isinstance(layer, keras.Model) and layer.name.startswith("mobilenet"):
-                base_model = layer
-                model.base_model = layer
-                break
-    if base_model is None:
-        raise ValueError("Model does not expose a MobileNetV2 base_model attribute")
-
-    base_model.trainable = True
-    for layer in base_model.layers[:-layers_to_unfreeze]:
-        layer.trainable = False
-
-
 def compile_model(
     model: keras.Model,
     *,

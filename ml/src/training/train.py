@@ -23,7 +23,6 @@ from ml.src.models.cnn import (
     build_mobilenet_v2_classifier,
     compile_model,
     set_global_seed,
-    unfreeze_top_layers,
 )
 from ml.src.training.dataset import (
     build_tf_dataset,
@@ -83,11 +82,10 @@ def train(
     output_dir: Path = DEFAULT_TRAINED_DIR,
     checkpoint_dir: Path = DEFAULT_CHECKPOINT_DIR,
     epochs: int = TRAINING_CONFIG.epochs,
-    fine_tune_epochs: int = TRAINING_CONFIG.fine_tune_epochs,
     batch_size: int = DATASET_CONFIG.batch_size,
     seed: int = DATASET_CONFIG.seed,
 ) -> dict[str, Any]:
-    """Execute transfer learning + optional fine-tuning and export the model."""
+    """Train the classification head on a frozen MobileNetV2 base and export it."""
 
     set_global_seed(seed)
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
@@ -155,38 +153,6 @@ def train(
         verbose=2,
     )
 
-    fine_history = None
-    if fine_tune_epochs > 0:
-        unfreeze_top_layers(model, layers_to_unfreeze=40)
-        compile_model(model, learning_rate=TRAINING_CONFIG.fine_tune_learning_rate)
-        fine_checkpoint = checkpoint_dir / "best_finetune.keras"
-        fine_callbacks = [
-            keras.callbacks.EarlyStopping(
-                monitor="val_accuracy",
-                patience=TRAINING_CONFIG.early_stopping_patience,
-                restore_best_weights=True,
-            ),
-            keras.callbacks.ModelCheckpoint(
-                filepath=str(fine_checkpoint),
-                monitor="val_accuracy",
-                save_best_only=True,
-            ),
-            keras.callbacks.ReduceLROnPlateau(
-                monitor="val_loss",
-                factor=0.5,
-                patience=2,
-                min_lr=1e-7,
-            ),
-        ]
-        fine_history = model.fit(
-            train_ds,
-            validation_data=val_ds,
-            epochs=fine_tune_epochs,
-            class_weight=class_weight,
-            callbacks=fine_callbacks,
-            verbose=2,
-        )
-
     test_images, test_labels = records_to_arrays(partitions["test"])
     y_true, y_pred, _probabilities = collect_predictions(
         model,
@@ -196,9 +162,7 @@ def train(
     )
     metrics = build_metrics_report(y_true, y_pred, names)
 
-    def _history_to_list(history: keras.callbacks.History | None) -> list[dict[str, float]]:
-        if history is None:
-            return []
+    def _history_to_list(history: keras.callbacks.History) -> list[dict[str, float]]:
         keys = list(history.history)
         length = len(history.history[keys[0]]) if keys else 0
         rows: list[dict[str, float]] = []
@@ -216,7 +180,7 @@ def train(
         "seed": seed,
         "batch_size": batch_size,
         "epochs_head": epochs,
-        "epochs_finetune": fine_tune_epochs,
+        "selected_checkpoint": "best_head",
         "best_val_accuracy": float(max(head_history.history.get("val_accuracy", [0.0]))),
         "partition_sizes": {
             name: len(partition_records)
@@ -224,7 +188,6 @@ def train(
         },
         "class_weights": class_weight,
         "history_head": _history_to_list(head_history),
-        "history_finetune": _history_to_list(fine_history),
         "image_size": list(DATASET_CONFIG.image_size),
         "preprocessing": "mobilenet_v2.preprocess_input",
         "split": {
@@ -245,13 +208,6 @@ def train(
             ],
         },
     }
-    if fine_history is not None and fine_history.history.get("val_accuracy"):
-        training_summary["best_val_accuracy"] = float(
-            max(
-                training_summary["best_val_accuracy"],
-                max(fine_history.history["val_accuracy"]),
-            )
-        )
 
     model_path = export_active_model(model, output_dir, metrics, training_summary)
     print(
@@ -269,11 +225,6 @@ def main() -> int:
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_TRAINED_DIR)
     parser.add_argument("--checkpoint-dir", type=Path, default=DEFAULT_CHECKPOINT_DIR)
     parser.add_argument("--epochs", type=int, default=TRAINING_CONFIG.epochs)
-    parser.add_argument(
-        "--fine-tune-epochs",
-        type=int,
-        default=TRAINING_CONFIG.fine_tune_epochs,
-    )
     parser.add_argument("--batch-size", type=int, default=DATASET_CONFIG.batch_size)
     parser.add_argument("--seed", type=int, default=DATASET_CONFIG.seed)
     args = parser.parse_args()
@@ -283,7 +234,6 @@ def main() -> int:
         output_dir=args.output_dir,
         checkpoint_dir=args.checkpoint_dir,
         epochs=args.epochs,
-        fine_tune_epochs=args.fine_tune_epochs,
         batch_size=args.batch_size,
         seed=args.seed,
     )

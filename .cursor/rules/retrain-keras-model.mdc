@@ -25,7 +25,7 @@ ml/data/raw/
 
 ```bash
 source .venv/bin/activate
-PYTHONPATH=. python -m ml.src.training.train --epochs 12 --fine-tune-epochs 6
+PYTHONPATH=. python -m ml.src.training.train --epochs 12
 ```
 
 4. Confirm the artifact is written to `ml/models/trained/active.keras` (plus `labels.json` / `class_names.json` / `metrics.json`).
