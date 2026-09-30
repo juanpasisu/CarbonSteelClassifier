@@ -34,6 +34,10 @@ class Settings(BaseSettings):
     supabase_service_role_key: str | None = None
     supabase_storage_bucket: str = "microstructure-images"
     model_path: str = "../ml/models/trained/active.keras"
+    # Optional HTTPS URL used by Docker/Render entrypoint to fetch active.keras.
+    model_url: str | None = None
+    # When set (e.g. /app/frontend/dist), FastAPI also serves the built SPA.
+    frontend_dist: str | None = None
     enable_prediction_logging: bool = True
 
     model_config = SettingsConfigDict(
@@ -47,6 +51,8 @@ class Settings(BaseSettings):
         "supabase_url",
         "supabase_anon_key",
         "supabase_service_role_key",
+        "model_url",
+        "frontend_dist",
         mode="before",
     )
     @classmethod
