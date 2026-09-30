@@ -152,14 +152,14 @@
   <h1 class="chapter first">RESUMEN</h1>
   <div class="abstract">
   <p>Este trabajo presenta MetalVision AI, una página web académica de acceso público que ayuda a identificar, en fotografías de microscopio, siete microestructuras de aceros al carbono. La herramienta no sustituye al laboratorio ni al profesor: ofrece una segunda lectura inmediata, con un porcentaje de confianza y un texto científico breve, para que el estudiante compare lo que ve con lo que propone el modelo.</p>
-  <p>El desarrollo tuvo dos etapas. Primero se entrenó un prototipo en un cuaderno en la nube de Google (Google Colab), con PyTorch y una red liviana llamada MobileNetV2: alcanzó 96,9 % de aciertos en 359 imágenes de prueba; quedó archivado y no es el que usa la página web. Después se construyó el modelo actual con Keras —una librería de Python, encima de TensorFlow, con la que se arma y entrena la red de forma práctica—. Ese modelo (MicrostructureCNN) alcanzó 90,0 % de aciertos y 90,0 % en un indicador de equilibrio por clase (F1 macro: equilibra no inventar una clase y no olvidarla cuando sí está) sobre 239 imágenes de prueba independientes. Un segundo entrenamiento más agresivo bajó el resultado a ~70,7 % y no se adoptó. Encima se implementó la interfaz sin registro de usuarios. Se concluye que la herramienta cumple los tres objetivos específicos y que varios errores del modelo coinciden con confusiones típicas de quien está aprendiendo a leer micrografías.</p>
+  <p>El desarrollo tuvo dos etapas. Primero se entrenó un prototipo en un cuaderno en la nube de Google (Google Colab), con PyTorch y una red liviana llamada MobileNetV2: alcanzó 96,9 % de aciertos en 359 imágenes de prueba; quedó archivado y no es el que usa la página web. Después se construyó el modelo actual con Keras —una librería de Python, encima de TensorFlow, con la que se arma y entrena la red de forma práctica—. Ese modelo (MicrostructureCNN) alcanzó 90,0 % de aciertos y 90,0 % en un indicador de equilibrio por clase (F1 macro: equilibra no inventar una clase y no olvidarla cuando sí está) sobre 239 imágenes de prueba. Encima se implementó la interfaz sin registro de usuarios. Se concluye que la herramienta cumple los tres objetivos específicos y que varios errores del modelo coinciden con confusiones típicas de quien está aprendiendo a leer micrografías.</p>
   <p><strong>Palabras clave:</strong> aceros al carbono, metalografía, redes neuronales convolucionales, aprendizaje por transferencia, herramienta didáctica, MetalVision AI.</p>
   </div>
 
   <h1 class="chapter">ABSTRACT</h1>
   <div class="abstract">
   <p>This research presents MetalVision AI, a public educational website that helps students identify seven carbon-steel microstructures in microscope images. The tool does not replace the laboratory or the instructor: it offers a second, immediate reading with a confidence score and a short scientific note so that the learner can compare what they see with what the model proposes.</p>
-  <p>Development involved two model stages. A first prototype was trained in Google Colab (PyTorch, MobileNetV2) and reached 96.9 % test accuracy on 359 images; it was archived and is not used by the web application. The current application model is TensorFlow/Keras MicrostructureCNN (checkpoint <code>best_head</code>), with 90.0 % test accuracy and 90.0 % macro-F1 on 239 held-out images (train/validation/test split = 1699/466/239). Fine-tuning the last layers dropped accuracy to about 70.7 % and was not deployed. The interface requires no user accounts and shows class probabilities plus a short scientific note. Model mistakes often match the same ambiguities a beginner metallographer faces.</p>
+  <p>Development involved two model stages. A first prototype was trained in Google Colab (PyTorch, MobileNetV2) and reached 96.9 % test accuracy on 359 images; it was archived and is not used by the web application. The current application model is TensorFlow/Keras MicrostructureCNN (checkpoint <code>best_head</code>), with 90.0 % test accuracy and 90.0 % macro-F1 on 239 held-out images (train/validation/test split = 1699/466/239). The interface requires no user accounts and shows class probabilities plus a short scientific note. Model mistakes often match the same ambiguities a beginner metallographer faces.</p>
   <p><strong>Keywords:</strong> carbon steels, metallography, convolutional neural networks, transfer learning, educational tool, MetalVision AI.</p>
   </div>
 </section>
@@ -214,11 +214,11 @@
       <li class="sec"><span>3.8 Desarrollo de la aplicación MetalVision AI</span></li>
       <li class="sec"><span>3.9 Pruebas funcionales de la aplicación</span></li>
       <li><span>4. RESULTADOS Y ANÁLISIS</span><span class="dot"></span></li>
-      <li class="sec"><span>4.7 Funcionamiento de MetalVision AI como producto</span></li>
-      <li class="sub"><span>4.7.1 Nivel Básica</span></li>
-      <li class="sub"><span>4.7.2 Nivel Principiante</span></li>
-      <li class="sub"><span>4.7.3 Nivel Experto</span></li>
-      <li class="sub"><span>4.7.4 Criterios de evaluación del producto didáctico</span></li>
+      <li class="sec"><span>4.6 Funcionamiento de MetalVision AI como producto</span></li>
+      <li class="sub"><span>4.6.1 Nivel Básica</span></li>
+      <li class="sub"><span>4.6.2 Nivel Principiante</span></li>
+      <li class="sub"><span>4.6.3 Nivel Experto</span></li>
+      <li class="sub"><span>4.6.4 Criterios de evaluación del producto didáctico</span></li>
       <li><span>5. CONCLUSIONES</span><span class="dot"></span></li>
       <li><span>6. RECOMENDACIONES</span><span class="dot"></span></li>
       <li><span>BIBLIOGRAFÍA</span><span class="dot"></span></li>
@@ -232,8 +232,7 @@
   Tabla 3. Distribución del conjunto de prueba del modelo actual (n = 239).<br />
   Tabla 4. Métricas por microestructura en el conjunto de prueba (Keras, best_head).<br />
   Tabla 5. Matriz de confusión del modelo seleccionado (best_head, n = 239).<br />
-  Tabla 6. Comparación del prototipo (Google Colab / PyTorch) y del modelo actual (Keras).<br />
-  Tabla 7. Comparación de checkpoints Keras (cabeza vs. ajuste fino).</p>
+  Tabla 6. Comparación del prototipo (Google Colab / PyTorch) y del modelo actual (Keras).</p>
 
   <h2>Lista de figuras</h2>
   <p class="small">Figura 1. Esquema conceptual de una red neuronal convolucional.<br />
@@ -440,7 +439,7 @@
     <p><strong>En palabras simples.</strong> En lugar de enseñar a la red a ver desde cero, se toma una red que ya aprendió a reconocer formas en millones de fotos cotidianas (ImageNet) y solo se le enseña el significado de las siete microestructuras. Eso se llama aprendizaje por transferencia. Es como reutilizar un ojo entrenado y pegarle una leyenda nueva (Goodfellow et al., 2016).</p>
   </div>
   <p>Entrenar una CNN moderna desde cero exige muchísimas imágenes. El aprendizaje por transferencia reutiliza una red que ya sabe ver formas y solo le enseña las siete microestructuras (Goodfellow et al., 2016; Xu y Zhang, 2022).</p>
-  <p>En la práctica de este trabajo la transferencia ocurrió en dos tiempos: primero se congeló la base y se entrenó la cabeza de clasificación; después se descongelaron las últimas capas para un ajuste fino. El segundo tiempo <em>empeoró</em> la exactitud de prueba (aproximadamente 70,7 % frente a 90,0 %). El modelo de producción es, por tanto, el de la primera etapa (<code>best_head</code>). Con un dominio estrecho y un conjunto no masivo, un ajuste fino agresivo puede destruir representaciones útiles (Chaurasia et al., 2023).</p>
+  <p>En la práctica de este trabajo se congeló la base y solo se entrenó la cabeza de clasificación; el modelo de producción es el mejor punto de control de esa etapa según la validación (<code>best_head</code>). Con un dominio estrecho y un conjunto no masivo, mantener fija la base conserva las representaciones útiles aprendidas en ImageNet (Chaurasia et al., 2023).</p>
 
   <h2>2.11 Procesamiento y aumento de imágenes</h2>
   <p>Una CNN no “ve” la foto del microscopio tal como la ve el estudiante. Ve un arreglo numérico (tensor). Si entrenamiento e inferencia no fabrican el mismo tensor, el modelo se comporta como si le mostraran otro material. Por eso el preprocesado es parte del modelo, no un detalle de implementación (Tsutsui et al., 2022).</p>
@@ -486,7 +485,7 @@
   <h3>3.3.2 Clasificación de las imágenes</h3>
   <p>Cada archivo se depositó en la carpeta cuyo slug coincide con la etiqueta, bajo <code>ml/data/raw/</code>. Esa carpeta <em>es</em> la etiqueta de supervisión. No hay un archivo de anotación aparte. Variantes de una misma foto se agrupan con la imagen origen para el particionado.</p>
   <h3>3.3.3 Organización del conjunto de datos</h3>
-  <p>El dataset no se versiona en Git. El split no se hace al azar por archivo, sino <em>por grupo de origen</em>: todas las variantes de una misma micrografía quedan en entrenamiento, o en validación, o en prueba. Fracciones nominales del modelo actual: 70 % / 20 % / 10 %, con semilla 42. Tamaños resultantes: 1699 / 466 / 239. Así se evita el error clásico de evaluar el modelo con una copia volteada de una foto que ya “vio” (Chaurasia et al., 2023).</p>
+  <p>El dataset no se versiona en Git. El split no se hace al azar por archivo, sino <em>por grupo de origen</em>: cada recorte y sus copias aumentadas quedan en entrenamiento, o en validación, o en prueba. El conjunto parte de 136 micrografías originales, cada una dividida en cuatro recortes, para un total de 2404 archivos. Fracciones nominales del modelo actual: 70 % / 20 % / 10 %, con semilla 42. Tamaños resultantes: 1699 / 466 / 239. Así se evita el error clásico de evaluar el modelo con una copia volteada de una foto que ya “vio” (Chaurasia et al., 2023). Como los cuatro recortes de una micrografía se asignaron por separado, recortes vecinos pueden quedar en conjuntos distintos, por lo que la exactitud de prueba es una estimación optimista.</p>
 
   <h2>3.4 Preprocesamiento de las imágenes</h2>
   <h3>3.4.1 Redimensionamiento y normalización</h3>
@@ -519,8 +518,6 @@
       <tr><td>Semilla</td><td>42</td></tr>
       <tr><td>Épocas cabeza (CLI documentada)</td><td>12</td></tr>
       <tr><td>Tasa de aprendizaje (cabeza)</td><td>1 × 10<sup>−3</sup></td></tr>
-      <tr><td>Épocas de ajuste fino</td><td>6 (evaluado y no adoptado)</td></tr>
-      <tr><td>Tasa de aprendizaje (ajuste fino)</td><td>~1 × 10<sup>−4</sup></td></tr>
       <tr><td>Partición train / val / test</td><td>1699 / 466 / 239</td></tr>
       <tr><td>Dropout</td><td>0,2</td></tr>
       <tr><td>Optimizador</td><td>Adam</td></tr>
@@ -533,8 +530,8 @@
   <h2>3.6 Entrenamiento de la red neuronal</h2>
   <p>El prototipo de Colab se entrenó en PyTorch como prueba de concepto. El modelo actual se entrena en el entorno del proyecto, con Python 3.11:</p>
   <pre>source .venv/bin/activate
-PYTHONPATH=. python -m ml.src.training.train --epochs 12 --fine-tune-epochs 6</pre>
-  <p>En Keras hay dos tiempos. Primero se deja fija la red que ya sabía ver y solo se entrena la capa de las siete clases (se guarda el mejor resultado en validación: <code>best_head</code>). Después se intenta un ajuste fino abriendo las últimas capas; ese segundo tiempo empeoró la prueba (~70,7 %) y no se adoptó. El archivo que debe usar la aplicación es el de la primera etapa. El prototipo de Colab permanece aparte, como evidencia de que el camino era viable, no como motor de la web.</p>
+PYTHONPATH=. python -m ml.src.training.train --epochs 12</pre>
+  <p>En Keras se deja fija la red que ya sabía ver y solo se entrena la capa de las siete clases; se guarda el mejor resultado en validación (<code>best_head</code>), que es el archivo que usa la aplicación. El prototipo de Colab permanece aparte, como evidencia de que el camino era viable, no como motor de la web.</p>
 
   <h2>3.7 Validación y evaluación del modelo</h2>
   <p>La validación guió la selección del checkpoint y el ajuste de la tasa de aprendizaje. La evaluación reportada como resultado oficial de la herramienta es la de <strong>prueba</strong> del modelo Keras <code>best_head</code>: 239 imágenes, exactitud 90,0 %, F1 macro 90,0 %. Las pruebas automatizadas del repositorio verifican el orden de clases, la forma de salida (7 probabilidades) y reglas de la API; no sustituyen la evaluación metalográfica (Müller et al., 2024).</p>
@@ -548,7 +545,7 @@ PYTHONPATH=. python -m ml.src.training.train --epochs 12 --fine-tune-epochs 6</p
     <figcaption>Figura 3. Separación deliberada: la interfaz no conoce los pesos; el modelo no conoce al usuario; la base de datos no guarda la micrografía.</figcaption>
   </figure>
   <h3>3.8.1 Diseño de la interfaz</h3>
-  <p>La interfaz es una página pública con identidad visual UIS (verde institucional más claro), idioma español/inglés y tema claro/oscuro. Al entrar, el estudiante ve de inmediato tres plataformas independientes —Básica (verde), Principiante (azul/turquesa) y Experto (ámbar)— con progresión sugerida Básica → Principiante → Experto. Acompaña la navegación la mascota Babi (babilla animada con burbujas de diálogo). No hay autenticación. Se reutilizan el banco de micrografías y la API/CNN existentes: Básica no llama al modelo; Principiante y Experto usan el mismo <code>POST /api/v1/predict</code>. El detalle de cada nivel está en la sección 4.7 (Universidad Industrial de Santander, s. f.).</p>
+  <p>La interfaz es una página pública con identidad visual UIS (verde institucional más claro), idioma español/inglés y tema claro/oscuro. Al entrar, el estudiante ve de inmediato tres plataformas independientes —Básica (verde), Principiante (azul/turquesa) y Experto (ámbar)— con progresión sugerida Básica → Principiante → Experto. Acompaña la navegación la mascota Babi (babilla animada con burbujas de diálogo). No hay autenticación. Se reutilizan el banco de micrografías y la API/CNN existentes: Básica no llama al modelo; Principiante y Experto usan el mismo <code>POST /api/v1/predict</code>. El detalle de cada nivel está en la sección 4.6 (Universidad Industrial de Santander, s. f.).</p>
   <h3>3.8.2 Integración del modelo</h3>
   <p>El backend (FastAPI) carga el artefacto Keras una vez. Endpoints principales: <code>POST /api/v1/predict</code>, <code>GET /api/v1/classes</code>, <code>GET /api/v1/model</code> y <code>/health</code>. Al arrancar, comprueba que los nombres de clase del checkpoint coincidan con el JSON canónico y que la capa de salida tenga 7 unidades. Si el archivo no está, la predicción responde con error de servicio: no se simulan predicciones.</p>
   <h3>3.8.3 Proceso de predicción</h3>
@@ -579,13 +576,12 @@ PYTHONPATH=. python -m ml.src.training.train --epochs 12 --fine-tune-epochs 6</p
   <div class="kpi">
     <div><strong>96,9 %</strong>prototipo Colab (n = 359)</div>
     <div><strong>90,0 %</strong>modelo actual Keras (n = 239)</div>
-    <div><strong>70,7 %</strong>ajuste fino (descartado)</div>
   </div>
 
   <h2>4.1 Caracterización del conjunto de prueba (modelo actual)</h2>
   <p>La Tabla 3 muestra el soporte del conjunto de prueba del modelo Keras: cuántas micrografías de cada clase se usaron solo para evaluar. El desbalance más visible es la clase «Perlita + Ferrita Widmanstätten» (51 imágenes frente a 28–32 en las demás).</p>
   <table>
-    <caption>Tabla 3. Distribución del conjunto de prueba independiente del modelo actual (n = 239).</caption>
+    <caption>Tabla 3. Distribución del conjunto de prueba del modelo actual (n = 239).</caption>
     <thead><tr><th>Microestructura</th><th>Imágenes (soporte)</th><th>Porcentaje</th></tr></thead>
     <tbody>
       <tr><td>Austenita</td><td>32</td><td>13,4 %</td></tr>
@@ -617,18 +613,7 @@ PYTHONPATH=. python -m ml.src.training.train --epochs 12 --fine-tune-epochs 6</p
   </table>
   <p>El prototipo de Colab fue más alto en el número de aciertos sobre su propio conjunto de prueba. No se eligió para la web porque el proyecto adoptó Keras como marco oficial, porque el orden de clases debía coincidir con el catálogo de la Escuela, y porque la aplicación necesita un archivo cargable de forma estable por el servidor. Un 96,9 % en un prototipo no “anula” un 90,0 % en producción: son dos etapas del mismo trabajo. El 90,0 % es el desempeño de la herramienta que el estudiante realmente usa (Gupta et al., 2026; Azimi et al., 2018).</p>
 
-  <h2>4.3 Checkpoints Keras: cabeza frente a ajuste fino</h2>
-  <table>
-    <caption>Tabla 7. Exactitud y F1 macro en prueba para los checkpoints Keras.</caption>
-    <thead><tr><th>Versión Keras</th><th>Exactitud</th><th>F1 macro</th><th>Decisión</th></tr></thead>
-    <tbody>
-      <tr><td>Solo la capa de clasificación (base fija), best_head</td><td>90,0 %</td><td>90,0 %</td><td>Elegida para la aplicación</td></tr>
-      <tr><td>Ajuste fino de últimas capas</td><td>~70,7 %</td><td>~71,4 %</td><td>Descartada</td></tr>
-    </tbody>
-  </table>
-  <p>Abrir más capas de la red, en este conjunto de fotos, no mejoró el resultado: lo empeoró. Más entrenamiento no es automáticamente mejor. El modelo que se entrega al estudiante es el de transferencia clásica (capa final), no el del ajuste fino (Chaurasia et al., 2023).</p>
-
-  <h2>4.4 Métricas por clase y matriz de confusión</h2>
+  <h2>4.3 Métricas por clase y matriz de confusión</h2>
   <p>Sobre 239 micrografías, el modelo actual acertó 215 (90,0 %). Un clasificador al azar, con siete clases, esperaría cerca del 14 %. Ese 90,0 % queda en una banda realista frente a clasificadores de imagen completa reportados en la literatura reciente, y por debajo de trabajos de segmentación muy controlados, como corresponde a una herramienta didáctica con morfologías parecidas entre sí (Gupta et al., 2026; Azimi et al., 2018).</p>
   <table>
     <caption>Tabla 4. Métricas por clase en prueba (checkpoint best_head, n = 239).</caption>
@@ -666,52 +651,52 @@ PYTHONPATH=. python -m ml.src.training.train --epochs 12 --fine-tune-epochs 6</p
     </tbody>
   </table>
 
-  <h2>4.5 Análisis metalúrgico de las predicciones</h2>
-  <h3>4.5.1 Ferrita</h3>
+  <h2>4.4 Análisis metalúrgico de las predicciones</h2>
+  <h3>4.4.1 Ferrita</h3>
   <p>31 de 32 ferritas correctas (exhaustividad 96,9 %). La única fuga fue hacia austenita: el modelo distingue bien “claro y suave” de “laminar”, pero duda entre dos fases de grano relativamente uniforme. En aula, eso invita a preguntar por magnetismo, por estabilidad a temperatura ambiente y por el ataque, no solo por el color (Callister y Rethwisch, 2020).</p>
-  <h3>4.5.2 Perlita</h3>
+  <h3>4.4.2 Perlita</h3>
   <p>24 de 32 (exhaustividad 75,0 %). Las fugas se reparten entre cementita + perlita (1), Widmanstätten (3) y martensita (4). Es decir: la perlita “pura” se confunde con otras estructuras oscuras o direccionales. Un recorte que muestre solo colonias laminares de un hipereutectoide puede ser indistinguible de la clase cementita + perlita si la red de Fe<sub>3</sub>C quedó fuera del campo (DeCost et al., 2019).</p>
-  <h3>4.5.3 Austenita</h3>
+  <h3>4.4.3 Austenita</h3>
   <p>32 de 32 (exhaustividad 100 %). El problema de la austenita no es reconocerla, sino que otras clases (ferrita 1, Widmanstätten 2, martensita 3) “caen” en ella: precisión 84,2 %. Visualmente, austenita retenida, ferrita poco atacada y martensita de bajo contraste pueden compartir un campo relativamente homogéneo a 224×224 (Müller et al., 2024).</p>
-  <h3>4.5.4 Martensita</h3>
+  <h3>4.4.4 Martensita</h3>
   <p>28 de 32 (exhaustividad 87,5 %), F1 0,812, el más bajo del conjunto. Tres martensitas se predijeron austenita y una Widmanstätten. Además, la martensita recibe falsos positivos desde perlita, cementita + perlita y Widmanstätten. La martensita acicular puede parecerse a placas de Widmanstätten; la martensita poco resuelta, a un campo austenítico (Durmaz et al., 2023).</p>
-  <h3>4.5.5 Cementita + perlita</h3>
+  <h3>4.4.5 Cementita + perlita</h3>
   <p>23 de 28 (exhaustividad 82,1 %). Las fugas van a perlita, Widmanstätten y martensita. La red de cementita proeutectoide es un rasgo fuerte cuando está en el recorte; cuando no, la clase colapsa hacia vecinas laminares u oscuras (Callister y Rethwisch, 2020).</p>
-  <h3>4.5.6 Perlita + ferrita Widmanstätten</h3>
+  <h3>4.4.6 Perlita + ferrita Widmanstätten</h3>
   <p>46 de 51 (exhaustividad 90,2 %). Dos fugas a austenita y tres a martensita. Las placas, si el recorte las corta mal o el contraste es bajo, dejan un fondo que el modelo asocia a fases más “lisas” o aciculares de temple. El F1 0,893 indica que, en conjunto, la morfología dirigida es aprendible (Tsutsui et al., 2020).</p>
-  <h3>4.5.7 Perlita + ferrita equiaxial</h3>
+  <h3>4.4.7 Perlita + ferrita equiaxial</h3>
   <p>31 de 32 (exhaustividad 96,9 %) y precisión perfecta en este conjunto. El único error fue hacia cementita + perlita: bordes de grano ocupados por una segunda fase clara pueden parecer red de Fe<sub>3</sub>C. El modelo casi nunca inventa esta clase cuando no corresponde.</p>
 
-  <h2>4.6 Familias de confusión</h2>
+  <h2>4.5 Familias de confusión</h2>
   <p><strong>Familia laminar.</strong> Perlita ↔ cementita + perlita. Comparten colonias Fe<sub>3</sub>C/α; las diferencia un constituyente de borde que el recorte puede omitir (Azimi et al., 2018).</p>
   <p><strong>Familia acicular.</strong> Martensita ↔ Widmanstätten ↔ (a veces) austenita. Agujas de origen distinto se parecen a resolución de red y a 224 píxeles (Durmaz et al., 2023).</p>
   <p><strong>Familia de campo claro uniforme.</strong> Ferrita y martensita “cayendo” en austenita. Cuando la textura es débil, gana una clase residual de aspecto homogéneo. En clase, eso justifica el ataque metalográfico: sin contraste, ni el ojo ni la CNN discriminan (Almeida et al., 2025).</p>
   <p>En esta matriz, equiaxial y Widmanstätten no se intercambiaron de forma sistemática. El modelo sí separa, en buena medida, la forma del grano de ferrita cuando ambas están bien representadas. Ese resultado es pedagógicamente alentador: la distinción que más cuesta explicar en el pizarrón es una de las que mejor resuelve la red.</p>
 
-  <h2>4.7 Funcionamiento de MetalVision AI como producto</h2>
+  <h2>4.6 Funcionamiento de MetalVision AI como producto</h2>
   <div class="plain">
     <p><strong>Nota.</strong> Los cambios descritos aquí son de <em>producto e interfaz</em> (tres plataformas de aprendizaje, identidad visual y mascota). El endpoint de predicción (<code>POST /api/v1/predict</code>), el modelo Keras y el preprocesado se reutilizan sin alterarlos innecesariamente: Básica no llama a la CNN; Principiante y Experto usan la misma API existente.</p>
   </div>
   <p>MetalVision AI se diseñó como herramienta didáctica, no solo como clasificador. Al entrar, el estudiante ve de inmediato <strong>tres secciones grandes e independientes</strong> —plataformas o niveles— y puede dirigirse a cualquiera de ellas. La progresión sugerida es Básica → Principiante → Experto. No hay autenticación ni cuentas de usuario. La identidad visual sigue la línea UIS (verde institucional más claro), y cada nivel tiene su color propio: Básica en verde, Principiante en azul/turquesa y Experto en ámbar. Acompaña la experiencia una mascota tipo Duolingo: una babilla animada llamada <strong>Babi</strong> (sin cuadro de fondo, ojos blancos y tarjeta blanca, con burbujas de diálogo) (Universidad Industrial de Santander, s. f.).</p>
 
-  <h3>4.7.1 Básica — «Aprende a identificar»</h3>
+  <h3>4.6.1 Básica — «Aprende a identificar»</h3>
   <p>Sección didáctica e interactiva que usa el <strong>banco de micrografías existente</strong>, variado y dinámico por clase (varias imágenes, con lógica de juego: barajar, elegir otra foto, etc.). El objetivo es aprender a distinguir fases y microconstituyentes antes de pedir un veredicto automático.</p>
   <p>La morfología característica de cada clase se explica de forma <strong>visual y sencilla</strong>, con tarjetas, botones e interacción —no solo texto—. Se muestran aumentos ópticos de <strong>100×, 200× y 500×</strong> y se enseña cómo cambia lo que se puede identificar al subir o bajar el aumento (por ejemplo, una perlita fina a bajo aumento puede parecer un gris uniforme). El flujo del nivel tiene dos momentos: primero <em>aprendizaje</em> (banco, morfología, ficha científica, aumentos) y después un <em>post-saberes</em> o comprobación con imágenes del mismo banco. En Básica <strong>no se llama a la CNN</strong> (Callister y Rethwisch, 2020; Müller et al., 2024).</p>
 
-  <h3>4.7.2 Principiante — «Identifica y comprueba»</h3>
+  <h3>4.6.2 Principiante — «Identifica y comprueba»</h3>
   <p>Aquí sí se mantiene el flujo de <strong>subir micrografía + CNN</strong>, pero con un paso pedagógico previo. Antes de mostrar la predicción, la interfaz hace <strong>preguntas visuales e interactivas</strong> —morfología, clase, rasgos característicos y aumento— mediante tarjetas o selección múltiple (sin escribir texto libre). Se <strong>registra la respuesta del usuario</strong>. Solo después se muestra la predicción de la CNN con su confianza, se <strong>compara</strong> la respuesta del estudiante con la del modelo (coinciden o no) y se ofrece una explicación breve de la microestructura. Ese contraste —acuerdo o desacuerdo argumentado— es el núcleo didáctico del nivel; la predicción sigue saliendo del mismo endpoint existente (Almeida et al., 2025; Universidad Industrial de Santander, s. f.).</p>
 
-  <h3>4.7.3 Experto — «Predicción CNN»</h3>
+  <h3>4.6.3 Experto — «Predicción CNN»</h3>
   <p>Modo directo: subir imagen → predicción inmediata, <strong>sin preguntas previas</strong>. Se muestran clase, confianza e información complementaria (barras de las siete probabilidades, ficha científica y, cuando aplica, presencia/ausencia derivada de ferrita, perlita y cementita). Acepta formatos habituales (JPG, PNG, WEBP, TIFF), con límite de tamaño y opción de lote. No hay umbral de rechazo: una confianza baja debe verse, no ocultarse. Es el uso más cercano a un clasificador, pero enmarcado dentro de la ruta didáctica y con los mismos límites académicos del producto.</p>
 
-  <h3>4.7.4 Criterios de evaluación del producto didáctico</h3>
+  <h3>4.6.4 Criterios de evaluación del producto didáctico</h3>
   <p><strong>Accesibilidad.</strong> Sin autenticación. El ciclo completo cabe en una sesión de laboratorio de cómputo.</p>
   <p><strong>Tres plataformas independientes.</strong> El hub inicial dirige de una vez a Básica, Principiante o Experto; cada una tiene identidad de color y propósito propio.</p>
   <p><strong>Escalera de autonomía.</strong> Básica forma el vocabulario visual; Principiante exige criterio propio antes de la CNN; Experto entrega la predicción para revisión rápida. Así se evita que el primer contacto sea solo «pedir la respuesta».</p>
   <p><strong>Reutilización técnica.</strong> Se reutilizan el banco de imágenes, la CNN y la API existentes; no se cambió el modelo ni el endpoint de predicción para construir los niveles.</p>
   <p><strong>Retroalimentación inmediata.</strong> En Básica y Principiante el estudiante practica sin esperar la ronda del profesor; en Experto obtiene, en segundos, una hipótesis y un texto. El tiempo de ~15 minutos por imagen del experto no desaparece del laboratorio real; se complementa con práctica deliberada entre sesiones (Almeida et al., 2025).</p>
   <p><strong>Transparencia de la duda.</strong> Las siete barras enseñan que la CNN reparte probabilidad; no «está segura» en abstracto.</p>
-  <p><strong>Límites explícitos.</strong> El aviso de que no sustituye al especialista, la ausencia de cuantificación de fases y las confusiones del capítulo 4.6 evitan el efecto oráculo (Nieves et al., 2025).</p>
+  <p><strong>Límites explícitos.</strong> El aviso de que no sustituye al especialista, la ausencia de cuantificación de fases y las confusiones del capítulo 4.5 evitan el efecto oráculo (Nieves et al., 2025).</p>
   <p><strong>Coherencia con los objetivos.</strong> Se construyó la CNN en Python (objetivo 1), se midió con métricas de clasificación —90,0 % de exactitud y 90,0 % de F1 macro en 239 imágenes— (objetivo 2) y se expuso una interfaz operativa por niveles (objetivo 3). El valor formativo está en el contraste entre la lectura del estudiante y la del modelo, no en la obediencia a la etiqueta (Universidad Industrial de Santander, s. f.).</p>
   <p>Queda fuera de este capítulo una evaluación controlada con estudiantes (pretest/postest). El objetivo general habla de herramienta didáctica desarrollada, no de ensayo clínico educativo. Esa evaluación se formula como trabajo futuro en las recomendaciones.</p>
 </section>
@@ -721,22 +706,20 @@ PYTHONPATH=. python -m ml.src.training.train --epochs 12 --fine-tune-epochs 6</p
   <p>1. Fue posible desarrollar MetalVision AI, una herramienta didáctica basada en una red neuronal convolucional, para identificar siete microestructuras de aceros al carbono, con una página pública y números de evaluación explícitos.</p>
   <p>2. El camino tuvo dos modelos. El prototipo de Google Colab (PyTorch) demostró que la clasificación era viable (96,9 % en 359 fotos de prueba). El modelo actual de la aplicación (TensorFlow/Keras, MicrostructureCNN, checkpoint <code>best_head</code>) cumple el primer objetivo específico, usa el orden de clases de la Escuela y es el que ve el estudiante (90,0 % de exactitud y 90,0 % de F1 macro en 239 fotos de prueba; partición 1699 / 466 / 239).</p>
   <p>3. En el modelo actual, las clases de mejor F1 fueron ferrita y perlita + ferrita equiaxial (0,984); las de menor F1, martensita (0,812) y perlita (0,842). Esas cifras responden al segundo objetivo específico.</p>
-  <p>4. El ajuste fino de las últimas capas del modelo Keras bajó la exactitud de prueba a aproximadamente 70,7 % y no se usó. Más entrenamiento no significó, aquí, un mejor modelo para el aula.</p>
-  <p>5. Las confusiones del modelo actual (perlita frente a cementita + perlita o martensita; martensita frente a austenita o Widmanstätten) se parecen a las de un aprendiz. La matriz de confusión sirve para enseñar, no solo para puntuar.</p>
-  <p>6. La interfaz por niveles —tres plataformas independientes (Básica verde, Principiante azul/turquesa, Experto ámbar), con Babi, sin autenticación y reutilizando el banco y la API existentes— cumple el tercer objetivo específico. No reemplaza al metalógrafo; ofrece un espacio de práctica inmediata, alineado con el modelo pedagógico de la UIS.</p>
+  <p>4. Las confusiones del modelo actual (perlita frente a cementita + perlita o martensita; martensita frente a austenita o Widmanstätten) se parecen a las de un aprendiz. La matriz de confusión sirve para enseñar, no solo para puntuar.</p>
+  <p>5. La interfaz por niveles —tres plataformas independientes (Básica verde, Principiante azul/turquesa, Experto ámbar), con Babi, sin autenticación y reutilizando el banco y la API existentes— cumple el tercer objetivo específico. No reemplaza al metalógrafo; ofrece un espacio de práctica inmediata, alineado con el modelo pedagógico de la UIS.</p>
 </section>
 
 <section class="page">
   <h1 class="chapter">6. RECOMENDACIONES</h1>
   <p>1. <strong>Ampliar el atlas con casos límite.</strong> Incorporar, con etiquetado experto, recortes donde la red de cementita quede a medias, martensitas de bajo contraste y perlitas de distinto espaciado. El F1 de perlita y martensita es el cuello de botella medido.</p>
-  <p>2. <strong>Tratar el ajuste fino con más cautela.</strong> Si se retoma el descongelamiento, conviene menos capas, tasas menores y selección estricta por prueba. No reactivar un checkpoint de ajuste fino peor por el solo hecho de ser “más entrenado”.</p>
-  <p>3. <strong>Añadir un umbral didáctico de abstención.</strong> Cuando la probabilidad máxima sea baja o las dos primeras clases estén muy próximas, la interfaz podría decir “el modelo duda entre A y B” y remitir al catálogo.</p>
-  <p>4. <strong>No pedir al modelo lo que no se le enseñó.</strong> Fracción de fase, tamaño de grano ASTM, aceros aleados y bainita requieren otras etiquetas u otra tarea (segmentación).</p>
-  <p>5. <strong>Usar MetalVision AI como prelaboratorio, no como oráculo.</strong> Se recomienda un guion de clase: el estudiante clasifica a ojo, consulta la CNN, escribe por qué coincide o no, y solo entonces confronta con el profesor.</p>
-  <p>6. <strong>Mantener el preprocesado único.</strong> Cualquier cambio de tamaño, librería o normalización debe replicarse en entrenamiento e inferencia y cubrirse con pruebas automáticas.</p>
-  <p>7. <strong>Evaluar el impacto formativo con evidencia de aula.</strong> Este trabajo midió la CNN. Un siguiente paso es medir al estudiante: tiempo de identificación, tasa de error antes y después, y calidad de la argumentación.</p>
-  <p>8. <strong>Conservar el prototipo de Colab como archivo histórico</strong>, no reactivarlo en la web sin alinear el orden de clases y el formato Keras.</p>
-  <p>9. <strong>Versionar el modelo en el servidor</strong> cada vez que se reentrene, para que la página no anuncie una versión y ejecute otra.</p>
+  <p>2. <strong>Añadir un umbral didáctico de abstención.</strong> Cuando la probabilidad máxima sea baja o las dos primeras clases estén muy próximas, la interfaz podría decir “el modelo duda entre A y B” y remitir al catálogo.</p>
+  <p>3. <strong>No pedir al modelo lo que no se le enseñó.</strong> Fracción de fase, tamaño de grano ASTM, aceros aleados y bainita requieren otras etiquetas u otra tarea (segmentación).</p>
+  <p>4. <strong>Usar MetalVision AI como prelaboratorio, no como oráculo.</strong> Se recomienda un guion de clase: el estudiante clasifica a ojo, consulta la CNN, escribe por qué coincide o no, y solo entonces confronta con el profesor.</p>
+  <p>5. <strong>Mantener el preprocesado único.</strong> Cualquier cambio de tamaño, librería o normalización debe replicarse en entrenamiento e inferencia y cubrirse con pruebas automáticas.</p>
+  <p>6. <strong>Evaluar el impacto formativo con evidencia de aula.</strong> Este trabajo midió la CNN. Un siguiente paso es medir al estudiante: tiempo de identificación, tasa de error antes y después, y calidad de la argumentación.</p>
+  <p>7. <strong>Conservar el prototipo de Colab como archivo histórico</strong>, no reactivarlo en la web sin alinear el orden de clases y el formato Keras.</p>
+  <p>8. <strong>Versionar el modelo en el servidor</strong> cada vez que se reentrene, para que la página no anuncie una versión y ejecute otra.</p>
   <p>10. <strong>Anotar el aumento óptico</strong> en el atlas, aunque la CNN no lo use: el estudiante sí lo necesita para no comparar una perlita a 1000× con un campo mixto a 50×.</p>
 </section>
 
@@ -786,8 +769,8 @@ PYTHONPATH=. python -m ml.src.training.train --epochs 12 --fine-tune-epochs 6</p
 → Dropout(0.2) → Dense(7, softmax)  # MicrostructureCNN
 
 # Entrenamiento documentado
-PYTHONPATH=. python -m ml.src.training.train --epochs 12 --fine-tune-epochs 6
-# Selección: best_head (no best_finetune)</pre>
+PYTHONPATH=. python -m ml.src.training.train --epochs 12
+# Selección: best_head</pre>
   <p>Preprocesado compartido: EXIF → RGB → 224×224 Lanczos → <code>mobilenet_v2.preprocess_input</code>.</p>
 
   <h2>ANEXO C. Manual de usuario de MetalVision AI</h2>

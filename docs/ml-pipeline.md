@@ -46,10 +46,10 @@ Compartido entre entrenamiento e inferencia (`ml/src/preprocessing/image.py`):
 
 ```bash
 source .venv/bin/activate
-PYTHONPATH=. python -m ml.src.training.train --epochs 12 --fine-tune-epochs 6
+PYTHONPATH=. python -m ml.src.training.train --epochs 12
 ```
 
-Incluye class weights, augmentation moderada, EarlyStopping, ModelCheckpoint y fine-tuning parcial.
+Entrena la capa de clasificación sobre la base MobileNetV2 congelada, con class weights, augmentation moderada, EarlyStopping y ModelCheckpoint (`best_head`).
 
 
 Validación externa (muestras de laboratorio ASTM E3 / ASTM E407, no usadas en entrenamiento):

@@ -32,11 +32,12 @@ Esta versión está pensada para **cualquier lector universitario cuidadoso**: e
 
 ## Cifras usadas (no simuladas)
 
-| Modelo | Exactitud prueba | n prueba | Estado |
-|--------|------------------|----------|--------|
-| Prototipo Google Colab (PyTorch) | 96,9 % | 359 | Archivado; no corre en la web |
-| Modelo actual Keras (`best_head`) | 90,0 % | 239 (1699/466/239) | En producción |
-| Ajuste fino Keras | ~70,7 % | — | Descartado |
+| Modelo | Exactitud validación | Exactitud prueba | F1 macro prueba | n prueba | Estado |
+|--------|----------------------|------------------|-----------------|----------|--------|
+| Prototipo Google Colab (PyTorch) | — | 96,9 % | — | 359 | Archivado; no corre en la web |
+| Modelo actual Keras (`best_head`, v2.0) | 85,6 % | 90,0 % | 90,0 % | 239 (1699/466/239 de 2404) | En producción |
+
+La partición es por grupo de origen (cada recorte con sus copias aumentadas); recortes de una misma micrografía pueden quedar en conjuntos distintos, por lo que la exactitud de prueba es una estimación optimista.
 
 Fuente del modelo actual: `ml/models/trained/metrics.json`.
 

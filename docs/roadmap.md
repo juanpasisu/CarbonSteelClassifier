@@ -15,6 +15,7 @@
 | 8 | Integración completa Frontend → FastAPI → CNN | Lista para verificación |
 | 9 | Pruebas y validación | En curso (20 tests OK) |
 | 10 | Documentación final | En actualización |
+| 11 | Docker + Render (despliegue público) | Lista (ver `docs/deployment.md`) |
 
 ## Decisiones vigentes
 
@@ -30,8 +31,8 @@
 - Nombre: MicrostructureCNN  
 - Versión: **2.0**  
 - Framework: tensorflow  
-- Accuracy test: **~89.7%** (checkpoint `best_head`; el fine-tune degradó el resultado y no se usó en producción)
+- Accuracy test: **90,0 %** (239 imágenes; checkpoint `best_head`, validación 85,6 %)
 
 ## Próxima fase
 
-Pulir frontend (FASE 7) y cerrar documentación académica final.
+Desplegar en Render con `MODEL_URL` + plan ≥1 GB RAM y cerrar la documentación académica final.

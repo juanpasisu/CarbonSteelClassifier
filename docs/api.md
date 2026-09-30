@@ -24,6 +24,8 @@ Consulta el modelo activo. Mientras no haya modelo cargado, responde con estado 
 
 Recibe una imagen (`multipart/form-data`, campo `file`), la valida, la preprocesa en memoria (224×224 RGB, `mobilenet_v2.preprocess_input`) y ejecuta la CNN. Además de la clase morfológica de siete etiquetas, responde la presencia/ausencia de ferrita, perlita y cementita.
 
+En Docker/Render el mismo host sirve la SPA; ver [`deployment.md`](deployment.md).
+
 Respuesta esperada cuando el modelo esté disponible:
 
 ```json

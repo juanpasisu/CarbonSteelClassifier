@@ -25,6 +25,8 @@ CarbonSteelClassifier es una herramienta académica de acceso público para iden
 └───────────────┘  └────────────────────┘
 ```
 
+En **Docker / Render** el frontend compilado (`FRONTEND_DIST`) se sirve desde el mismo proceso FastAPI (mismo origen). Ver [`deployment.md`](deployment.md).
+
 ### Frontend
 
 Aplicación pública con React, Vite, TypeScript y Tailwind CSS. El usuario entra y analiza una imagen sin crear cuenta. No se usa Supabase Auth en el cliente.
