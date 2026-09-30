@@ -84,6 +84,22 @@ MODEL_URL="https://ejemplo.com/active.keras" docker compose up --build
 
 Cold start en planes bajos puede tardar 1–2 minutos (carga de TensorFlow + descarga del modelo).
 
+### Despliegue continuo (GitHub Actions)
+
+El workflow `.github/workflows/deploy-render.yml` se ejecuta en cada push a `main`:
+
+1. `pytest` (API + ML, Python 3.11) y `vitest` + `tsc` + build de Vite en paralelo.
+2. Si ambos pasan, llama al Deploy Hook de Render y se construye la nueva imagen.
+
+En pull requests solo se ejecutan las pruebas. El autodeploy nativo de Render está desactivado (`autoDeployTrigger: "off"` en `render.yaml`) para no desplegar commits que fallen las pruebas.
+
+Configuración única:
+
+1. Render → servicio `metalvision-ai` → **Settings → Deploy Hook** → copiar la URL.
+2. GitHub → repositorio → **Settings → Secrets and variables → Actions → New repository secret**: `RENDER_DEPLOY_HOOK_URL` con esa URL.
+
+El Deploy Hook es un secreto: quien lo tenga puede disparar despliegues. Si se filtra, regenerarlo en Render y actualizar el secret.
+
 ## Alternativa: frontend estático + API
 
 Si prefieres dos servicios:

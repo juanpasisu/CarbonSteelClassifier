@@ -10,6 +10,8 @@ services:
     dockerfilePath: ./Dockerfile
     dockerContext: .
     healthCheckPath: /health
+    # Deploys are triggered by .github/workflows/deploy-render.yml after CI passes.
+    autoDeployTrigger: "off"
     # Free = 512 MB RAM; TensorFlow may OOM. Switch to starter if it does.
     envVars:
       - key: PYTHONPATH
